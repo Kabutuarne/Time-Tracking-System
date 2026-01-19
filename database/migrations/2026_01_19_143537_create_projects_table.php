@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // project owner | should remove project if owner is gone
+            // add multiple users to one project through a pivot table
         });
     }
 
