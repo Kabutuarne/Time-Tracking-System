@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,14 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->sentence(3),
+            'description' => fake()->paragraph(),
+            // 'project_id' => Project::factory(),
+            'project_id' => null, // will be set in the seeder
+            'due_date' => fake()->optional()->dateTimeBetween('now', '+1 year'),
+            'completed_at' => null,
+            'completed_by' => null,
+            'status' => 'pending',
         ];
     }
 }

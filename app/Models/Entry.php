@@ -9,4 +9,14 @@ class Entry extends Model
 {
     /** @use HasFactory<\Database\Factories\EntryFactory> */
     use HasFactory;
+    protected $fillable = [
+        'task_id',
+        'user_id',
+        'title',
+        'description',
+    ];
+
+    public function task(){
+        return $this->belongsTo(Task::class);
+    }
 }

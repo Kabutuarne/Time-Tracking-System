@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,7 +18,12 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->company(),
+            'description' => fake()->paragraph(),
+            // 'user_id' => User::factory(),
+            'user_id' => null, // will be set in the seeder
+            'status' => fake()->randomElement(['active', 'completed', 'on-hold', 'archived']),
+            'is_public' => fake()->boolean(30), // 30% to be true
         ];
     }
 }

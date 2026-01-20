@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('project_user', function (Blueprint $table) {
             $table->id();
+            $table->timestamps();
             $table->foreignId('project_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
             //pivot data
-            $table->string('role')->default('member'); // role in the project
+            $table->enum('role', ['member', 'manager'])->default('member');
             $table->unique(['project_id', 'user_id']);
         });
     }

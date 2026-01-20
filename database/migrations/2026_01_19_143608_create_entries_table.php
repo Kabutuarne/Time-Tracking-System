@@ -14,11 +14,12 @@ return new class extends Migration
     {
         Schema::create('entries', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('task_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->date('work_date');
+            $table->integer('minutes'); // stored in minutes
+            $table->text('description')->nullable();
             $table->timestamps();
-            $table->foreignId('task_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            // $table->dateTime('created_at'); timestamps() does this idiot
-            // $table->dateTime('updated_at')->default(DB::raw('CURRENT_TIMESTAMP')); //current timestamp on update
         });
     }
 
