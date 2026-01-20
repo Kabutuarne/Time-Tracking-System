@@ -15,13 +15,24 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
-        'owner_id',
+        'user_id',
         'status',
     ];
-    public function users(){
-        return $this->belongsToMany(User::class)->withPivot('role')->withTimestamps();
-    }
-    public function tasks(){
-        return $this->hasMany(Task::class);
-    }
+    public function user()
+        {
+            return $this->belongsTo(User::class);
+        }
+
+    public function users()
+        {
+            return $this->belongsToMany(User::class)
+                ->withPivot('role')
+                ->withTimestamps();
+        }
+
+    public function tasks()
+        {
+            return $this->hasMany(Task::class);
+        }
+
 }
