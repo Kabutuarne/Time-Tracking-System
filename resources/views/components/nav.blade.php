@@ -1,42 +1,42 @@
 <nav class="bg-darker shadow-lg">
     <div class="container mx-auto px-4">
         <div class="flex items-center justify-between h-16">
-            <div class="flex items-center">
-                <a href="{{ route('projects.index') }}" class="text-2xl font-bold text-primary">
-                    TimeBase
-                    {{-- work on name later --}}
-                </a>
+            <div class="flex items-center justify-between w-full">
+                {{-- nav links --}}
+                <div class="flex items-center">
+                <x-logo />
             </div>
-
-            <div class="flex items-center space-x-6">
-                <a href="{{ route('projects.index') }}" class="text-secondary hover:text-primary transition">
-                    Find projects
-                </a>
-                <a href="#" class="text-secondary hover:text-primary transition">
-                    Tasks
-                </a>
-
+                @auth
+                    <div>
+                        <x-forms.button href="{{ route('projects.index') }}">Home</x-forms.button>
+                        <x-forms.button href="{{ route('projects.index') }}">Your Tasks</x-forms.button>
+                        <x-forms.button href="{{ route('projects.create') }}">Create a Project</x-forms.button>
+                    </div>
+                @else
+                    <div>
+                        <x-forms.button href="{{ route('projects.index') }}">Home</x-forms.button>
+                    </div>
+                @endauth
+                {{-- search bar --}}
+                <x-forms.search-input placeholder="Find public projects..." />
                 @auth
                     <div class="flex items-center space-x-4">
                         <span class="text-secondary text-sm">
                             {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}
                         </span>
                         {{-- logout --}}
-                        <form method="POST" action="" class="inline">
+                        <form method="POST" action="{{ route('logout') }}" class="inline">
                             @csrf
-                            <button type="submit" class="text-secondary hover:text-primary transition text-sm">
-                                Logout
-                            </button>
+                            <x-forms.button>Logout</x-forms.button>
                         </form>
                     </div>
                 @else
-                    {{-- login / regster --}}
-                    <a href="" class="text-secondary hover:text-primary transition">
-                        Login
-                    </a>
-                    <a href="" class="text-secondary hover:text-primary transition">
-                        Register
-                    </a>
+                    {{-- login / register --}}
+                    <div class="flex items-center space-x-4">
+                        {{-- :active="request()->routeIs('login')" and so on--}}
+                        <x-forms.button :active='true' href="{{ route('login') }}">Login</x-forms.button>
+                        <x-forms.button href="{{ route('register') }}">Register</x-forms.button>
+                    </div>
                 @endauth
             </div>
         </div>

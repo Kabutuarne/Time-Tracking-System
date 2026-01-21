@@ -11,11 +11,12 @@
             theme: {
                 extend: {
                     colors: { // color scheme
-                        primary: '#ECA400',
-                        secondary: '#EAF8BF',
-                        accent: '#006992',
-                        dark: '#27476E',
-                        darker: '#001D4A'
+                        accent: '#380036',
+                        textcol: '#F1E4E8',
+                        dark: '#26081C',
+                        primary: '#01BAEF',
+                        darker: '#150811',
+                        secondary: '#0CBABA'
                     }
                 }
             }
