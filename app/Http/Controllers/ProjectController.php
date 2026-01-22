@@ -16,6 +16,7 @@ class ProjectController extends Controller
         $projects = Project::with([
             'user',
             'users',
+            'tasks',
             'tasks.entries'
         ])->get();
         return view('projects.index', compact('projects'));
@@ -49,7 +50,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        //
+        return view('projects.show', compact('project'));
     }
 
     /**

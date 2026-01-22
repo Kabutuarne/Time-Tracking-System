@@ -19,6 +19,7 @@
                 colors: { // color scheme
                     accent: '#380036',
                     textcol: '#F1E4E8',
+                    textcol2: 'rgb(197, 168, 183)',
                     dark: '#26081C',
                     primary: '#01BAEF',
                     darker: '#150811',

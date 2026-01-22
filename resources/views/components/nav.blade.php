@@ -4,11 +4,12 @@
             <div class="flex items-center justify-between w-full">
                 {{-- nav links --}}
                 <div class="flex items-center">
-                <x-logo />
-            </div>
+                    <x-logo />
+                </div>
                 @auth
                     <div>
-                        <x-forms.button href="{{ route('projects.index') }}">Home</x-forms.button>
+                        <x-forms.button href="{{ route('projects.index') }}"><i class="fa-solid fa-user"></i>
+                        </x-forms.button>
                         <x-forms.button href="{{ route('projects.index') }}">Your Tasks</x-forms.button>
                         <x-forms.button href="{{ route('projects.create') }}">Create a Project</x-forms.button>
                     </div>
@@ -33,7 +34,7 @@
                 @else
                     {{-- login / register --}}
                     <div class="flex items-center space-x-4">
-                        {{-- :active="request()->routeIs('login')" and so on--}}
+                        {{-- :active="request()->routeIs('login')" todo later--}}
                         <x-forms.button :active='true' href="{{ route('login') }}">Login</x-forms.button>
                         <x-forms.button href="{{ route('register') }}">Register</x-forms.button>
                     </div>

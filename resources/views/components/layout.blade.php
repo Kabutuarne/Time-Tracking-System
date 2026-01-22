@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Project Manager' }}</title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,6 +14,7 @@
                     colors: { // color scheme
                         accent: '#380036',
                         textcol: '#F1E4E8',
+                        textcol2: 'rgb(197, 168, 183)',
                         dark: '#26081C',
                         primary: '#01BAEF',
                         darker: '#150811',
@@ -24,7 +26,7 @@
     </script>
 </head>
 
-<body class="bg-accent">
+<body class="bg-dark">
     <x-nav />
 
     <main class="container mx-auto px-4 py-8">
