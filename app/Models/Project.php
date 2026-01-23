@@ -34,5 +34,8 @@ class Project extends Model
         {
             return $this->hasMany(Task::class);
         }
-
+    public function entries()
+        {
+            return $this->hasManyThrough(Entry::class, Task::class, 'project_id', 'task_id');
+        }
 }

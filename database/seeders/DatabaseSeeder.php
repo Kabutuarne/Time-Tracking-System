@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         //User::factory(10)->create();
         $users = User::factory(10)->create();
 
-        // make projects with owners and members 
+        // make projects with members 
         Project::factory()
             ->count(5)
             ->make()
@@ -30,8 +30,9 @@ class DatabaseSeeder extends Seeder
                 $project->user_id = $owner->id; // set project owner
                 $project->save();
 
-                $members = $users->random(rand(2, 5));
-                $project->users()->attach($members->pluck('id')->push($owner->id)->unique());
+                // exclude owner from potential members
+                $members = $users->where('id', '!=', $owner->id)->random(rand(2, min(5, $users->count() - 1)));
+                $project->users()->attach($members->pluck('id'));
 
                 //tasks for project
                 $tasks = Task::factory(rand(2,10))->make(['project_id' => $project->id]);
@@ -40,10 +41,10 @@ class DatabaseSeeder extends Seeder
                 //entries for each task
                 foreach ($tasks as $task){
                     Entry::factory(rand(1,5))
-                    ->make([
-                        'task_id' => $task->id,
-                        'user_id' => $project->users->random()->id,
-                    ])->each(fn ($entry) => $entry->save());
+                        ->make([
+                            'task_id' => $task->id,
+                            'user_id' => $project->users->random()->id,
+                        ])->each(fn ($entry) => $entry->save());
                 }
             });
             // $tasks = Task::factory()->count(rand(2,10))->make(['project_id' => $project->id]);

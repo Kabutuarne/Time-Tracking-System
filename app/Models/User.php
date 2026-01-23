@@ -53,4 +53,12 @@ class User extends Authenticatable
     public function projects(){
         return $this->belongsToMany(Project::class)->withPivot('role')->withTimestamps();
     }
+    // check if the user is a manager of a given project
+    public function isManagerOf(Project $project): bool
+    {
+        return $this->projects()
+            ->wherePivot('project_id', $project->id)
+            ->wherePivot('role', 'manager')
+            ->exists();
+    }
 }

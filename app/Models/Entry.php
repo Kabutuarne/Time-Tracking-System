@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Task;
+use App\Models\User;
+use App\Models\Project;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Entry extends Model
 {
@@ -18,5 +21,21 @@ class Entry extends Model
 
     public function task(){
         return $this->belongsTo(Task::class);
+    }
+    //created by the user
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
+
+    public function project()
+{
+    return $this->hasOneThrough(
+        Project::class,
+        Task::class,
+        'id',          // Task primary key
+        'id',          // Project primary key
+        'task_id',     // Entry -> task
+        'project_id'   // Task -> project
+        );
     }
 }

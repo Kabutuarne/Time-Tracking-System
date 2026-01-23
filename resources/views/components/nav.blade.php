@@ -34,7 +34,7 @@
                 @else
                     {{-- login / register --}}
                     <div class="flex items-center space-x-4">
-                        {{-- :active="request()->routeIs('login')" todo later--}}
+                        {{-- :active="request()->routeIs('login')" to do later--}}
                         <x-forms.button :active='true' href="{{ route('login') }}">Login</x-forms.button>
                         <x-forms.button href="{{ route('register') }}">Register</x-forms.button>
                     </div>

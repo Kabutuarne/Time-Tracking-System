@@ -5,29 +5,35 @@
 @php
     if ($type === 'members') {
         $icon = 'fa-solid fa-users';
-        $count = $project->users->count();
+        $count = $project->users_count;
         $slot = 'Members';
+        $color = 'text-primary';
+        $bg = 'bg-primary/10';
     } elseif ($type === 'tasks') {
         $icon = 'fa-solid fa-tasks';
-        $count = $project->tasks->count();
+        $count = $project->tasks_count;
         $slot = 'Tasks';
+        $color = 'text-secondary';
+        $bg = 'bg-secondary/10';
     } elseif ($type === 'entries') {
-        $icon = 'fa-solid fa-clock';
-        $count = $project->tasks->flatMap->entries->count();
+        $icon = 'fas fa-pencil-alt';
+        $count = $project->entries_count;
         $slot = 'Entries';
+        $color = 'text-primary';
+        $bg = 'bg-primary/10';
     } else {
         $icon = 'fa-solid fa-circle-info';
         $count = -1;
         $slot = 'Unknown';
+        $color = 'text-textcol2';
+        $bg = 'bg-slate-800/50';
     }
 @endphp
 
-<div class="rounded-xl bg-dark p-4">
+<div class="rounded-lg {{ $bg }} p-3">
     <div class="flex items-center gap-2">
-        <div stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5 text-textcol">
-            <i class="{{ $icon }}"></i>
-        </div>
-        <span class="text-sm font-medium text-textcol">{{ $count }}</span>
+        <i class="{{ $icon }} {{ $color }} text-sm"></i>
+        <span class="text-sm font-semibold {{ $color }}">{{ $count }}</span>
     </div>
-    <p class="mt-1 text-xs text-textcol2">{{ $slot }}</p>
+    <p class="text-sm font-semibold {{ $color }}">{{ $slot }}</p>
 </div>

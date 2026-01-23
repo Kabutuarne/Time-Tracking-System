@@ -14,6 +14,13 @@ class TaskController extends Controller
     {
         //
     }
+    /**
+     * Mark the specified task as completed.
+     */
+    public function complete(Task $task)
+    {
+        
+    }
 
     /**
      * Show the form for creating a new resource.

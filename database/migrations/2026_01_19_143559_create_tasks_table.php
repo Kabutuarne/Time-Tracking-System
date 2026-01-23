@@ -20,8 +20,7 @@ return new class extends Migration
             $table->dateTime('due_date')->nullable();
             $table->dateTime('completed_at')->nullable();
             $table->foreignId('completed_by')->nullable()->constrained('users')->onDelete('set null');
-            $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending');
-
+            $table->enum('status', ['in_progress', 'completed', 'archived'])->default('in_progress');
         });
     }
 
