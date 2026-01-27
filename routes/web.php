@@ -21,10 +21,22 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-Route::resource('projects', ProjectController::class);
+// nested resource routes
+Route::resource('projects', ProjectController::class)->scoped();
+Route::resource('projects.tasks', TaskController::class)->scoped();
+Route::resource('projects.tasks.entries', EntryController::class)->scoped();
 Route::resource('users', UserController::class);
-Route::resource('entries', EntryController::class);
-Route::resource('tasks', TaskController::class);
+
+Route::scopeBindings()->group(function () {
+    // Mark task as completed
+    Route::get('projects/{project}/tasks/{task}/complete', [TaskController::class, 'complete'])
+        ->name('projects.tasks.complete');
+    // Archive task
+    Route::get('projects/{project}/tasks/{task}/archived', [TaskController::class, 'archived'])
+        ->name('projects.tasks.archived');
+});
+
+
 // ->middleware('auth');
 
 require __DIR__.'/auth.php';

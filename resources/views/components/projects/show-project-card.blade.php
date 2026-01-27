@@ -51,7 +51,6 @@
                             {{-- Users + the owner --}}
                             <span
                                 class="text-sm font-semibold text-textcol">{{ ($project->users->count() ?? 0) + 1}}</span>
-
                         </div>
                     </div>
                     <div class="flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2">
@@ -73,7 +72,7 @@
                 {{-- @auth --}}
                 {{-- @if (auth()->user()->is($project->user) || $project->users->contains(auth()->user())) --}}
                 <div class="flex flex-wrap gap-3">
-                    <x-forms.button :href="route('tasks.create', $project)">
+                    <x-forms.button :href="route('projects.tasks.create', $project)">
                         <i class="fa-solid fa-tasks mr-2"></i>Add Task
                     </x-forms.button>
                     {{-- @if (auth()->user()->is($project->user) || auth()->user()->isManagerOf($project)) --}}
@@ -111,7 +110,7 @@
                         <h2 class="text-2xl font-bold text-textcol">Tasks</h2>
                         <div class="space-y-3">
                             @forelse ($tasks ?? [] as $task)
-                                <x-projects.task-card :task="$task" />
+                                <x-projects.task-card :project="$project" :task="$task" />
                             @empty
                                 <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
                                     <i class="fa-solid fa-tasks text-3xl text-slate-600 mb-2"></i>
@@ -120,29 +119,6 @@
                             @endforelse
                         </div>
                         {{ $tasks->links() }}
-
-                        {{-- Admin Actions --}}
-                        @auth
-                            @if (auth()->user()->is($project->user))
-                                <div class="rounded-2xl bg-slate-950/40 p-6 ring-1 ring-white/5 mt-6">
-                                    <h3 class="text-lg font-semibold text-textcol mb-4">Admin Actions</h3>
-                                    <div class="space-y-3">
-                                        {{-- Will be accessible only to Owner and Manager --}}
-                                        <x-forms.button class="w-full" :href="route('projects.edit', $project)">
-                                            <i class="fa-solid fa-edit mr-2"></i>Edit Project
-                                        </x-forms.button>
-                                        <form method="POST" action="{{ route('projects.destroy', $project) }}"
-                                            onsubmit="return confirm('Are you sure you want to delete this project?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <x-forms.button type="submit" :secondary="true" class="w-full">
-                                                <i class="fa-solid fa-trash mr-2"></i>Delete Project
-                                            </x-forms.button>
-                                        </form>
-                                    </div>
-                                </div>
-                            @endif
-                        @endauth
                     </div>
                 </div>
 

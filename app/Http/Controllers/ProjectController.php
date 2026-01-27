@@ -81,11 +81,11 @@ class ProjectController extends Controller
             ->keyBy('id');
 
         // entry pagination
-        $entries = $project->entries()
+        $entries = $project->entries()->latest()
             ->with(['user', 'task', 'project'])
             ->paginate(5, ['*'], 'entries_page');
         // task pagination
-        $tasks = $project->tasks()
+        $tasks = $project->tasks()->latest()
             ->with('project')
             ->paginate(5, ['*'], 'tasks_page');
 

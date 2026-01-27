@@ -1,5 +1,6 @@
 @props([
     'task' => $task,
+    'project' => $project,
 ])
 @php
     // Status colors and icons
@@ -59,6 +60,7 @@
             </div>
         @endif
 
+
         @if($task->status === 'completed')
             <div class="mb-2 rounded bg-green-500/10 px-2 py-1">
                 <p class="text-xs text-green-400 font-medium">
@@ -66,10 +68,10 @@
                 </p>
             </div>
             {{-- Can set active or archive only Manager and Owner --}}
-            <x-forms.sm-button :secondary="true">
+            <x-forms.sm-button :secondary="true" href="{{ route('projects.tasks.complete', [$project, $task]) }}">
                 Set Active
             </x-forms.sm-button>
-            <x-forms.sm-button>
+            <x-forms.sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}">
                 Archive Task
             </x-forms.sm-button>
         @elseif($task->status === 'in_progress')
@@ -79,11 +81,11 @@
                 </p>
             </div>
             {{-- Will be able to set completed in the entry --}}
-            <x-forms.sm-button :secondary="true">
+            <x-forms.sm-button :secondary="true" href="{{ route('projects.tasks.complete', [$project, $task]) }}">
                 Add Entry
             </x-forms.sm-button>
             {{-- Can archive only Manager and Owner --}}
-            <x-forms.sm-button>
+            <x-forms.sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}">
                 Archive Task
             </x-forms.sm-button>
             {{-- <x-forms.sm-button :secondary="true" :href="route('tasks.complete', $task)"> --}}
@@ -95,19 +97,21 @@
                 </p>
             </div>
             {{-- Can set active or archive only Manager and Owner --}}
-            <x-forms.sm-button :secondary="true">
-                Set Active
-            </x-forms.sm-button>
-            <x-forms.sm-button>
-                Delete
-            </x-forms.sm-button>
+            <form method="POST"
+                                      action="{{ route('projects.tasks.destroy', [$task->project, $task]) }}"
+                                      class="absolute bottom-[-7%] left-[15%]"
+                                >
+                                    @csrf
+                                    @method('DELETE')
+                                    <x-forms.trash-button></x-forms.trash-button>
+                                </form>
         @endif
 
         <div class="flex items-center justify-between border-t border-white/5 pt-2">
-            <x-forms.sm-button :href="route('tasks.show', $task)">View</x-forms.sm-button>
+            <x-forms.sm-button :href="route('projects.tasks.show', [$project, $task])">View</x-forms.sm-button>
             {{-- @auth --}}
                 {{-- @if(auth()->user()->isManagerOf($task->project) || auth()->user()->is($task->project->user)) --}}
-                    <x-forms.sm-button :href="route('tasks.edit', $task)">Edit</x-forms.sm-button>
+                    <x-forms.sm-button :href="route('projects.tasks.edit', [$project, $task])">Edit</x-forms.sm-button>
                 {{-- @endif --}}
             {{-- @endauth --}}
         </div>

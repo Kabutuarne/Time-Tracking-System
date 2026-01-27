@@ -7,15 +7,17 @@
                     <x-logo />
                 </div>
                 @auth
-                    <div>
-                        <x-forms.button href="{{ route('projects.index') }}"><i class="fa-solid fa-user"></i>
-                        </x-forms.button>
-                        <x-forms.button href="{{ route('projects.index') }}">Your Tasks</x-forms.button>
-                        <x-forms.button href="{{ route('projects.create') }}">Create a Project</x-forms.button>
+                    <div class="flex gap-2">
+                        <div>
+                            <x-forms.button href="{{ route('projects.index') }}">Your Projects</x-forms.button>
+                        </div>
+                        <div>
+                            <x-forms.button href="{{ route('projects.create') }}">Create a Project</x-forms.button>
+                        </div>
                     </div>
                 @else
                     <div>
-                        <x-forms.button href="{{ route('projects.index') }}">Home</x-forms.button>
+
                     </div>
                 @endauth
                 {{-- search bar --}}
@@ -23,7 +25,7 @@
                 @auth
                     <div class="flex items-center space-x-4">
                         <span class="text-secondary text-sm">
-                            {{ auth()->user()->first_name }} {{ auth()->user()->last_name }}
+                            {{ auth()->user()->username }}
                         </span>
                         {{-- logout --}}
                         <form method="POST" action="{{ route('logout') }}" class="inline">

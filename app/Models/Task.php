@@ -31,7 +31,7 @@ class Task extends Model
     public function entries(){
         return $this->hasMany(Entry::class);
     }
-    public function completedBy(){ //returns the user who completed the task
+    public function completedBy(){ //returns the user who marked the task as completed
         return $this->belongsTo(User::class, 'completed_by');
     }
 }

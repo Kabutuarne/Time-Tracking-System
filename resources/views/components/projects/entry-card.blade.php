@@ -47,10 +47,10 @@
             {{-- Allows editing and deleting entries only for Managers, entry creators or project owners --}}
             @auth
               @if (auth()->user()->is($entry->user) || auth()->user()->isManagerOf($entry->project) || auth()->user()->is($entry->project->user))
-                  <x-forms.sm-button :href="route('entries.edit', $entry)">
+                  <x-forms.sm-button :href="route('projects.tasks.entries.edit', $entry)">
                     Edit Entry
                 </x-forms.sm-button>
-                <x-forms.sm-button :href="route('entries.show', $entry)">
+                <x-forms.sm-button :href="route('projects.tasks.entries.show', $entry)">
                     Delete Entry
                 </x-forms.sm-button>
               @endif  

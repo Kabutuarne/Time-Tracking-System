@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Task;
 use App\Models\Entry;
+use App\Models\Project;
 use Illuminate\Http\Request;
 
 class EntryController extends Controller
@@ -18,7 +20,7 @@ class EntryController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create($project, $task)
     {
         //
     }
@@ -58,8 +60,15 @@ class EntryController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Entry $entry)
+    public function destroy(Project $project, Task $task, Entry $entry)
     {
-        //
+        abort_unless(
+    $project->id === $task->project_id && $task->id === $entry->task_id,
+    404
+        );
+
+        $entry->delete();
+        return back();
     }
+
 }
