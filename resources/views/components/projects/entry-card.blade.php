@@ -1,6 +1,7 @@
 @props([
     'entry' => $entry,
 ])
+
 <div class="group relative overflow-hidden rounded-xl bg-slate-950/40 ring-1 ring-white/5 transition-all duration-300 hover:ring-primary/30">
     <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-primary/10 to-secondary/0 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-70"></div>
     
@@ -26,11 +27,14 @@
                 @endif
                 
                 @if($entry->task)
-                    <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-secondary/10 px-3 py-1">
+                <div class="flex mt-3 gap-3">
+                    <div class="inline-flex items-center gap-1.5 rounded-full bg-secondary/10 px-3 py-1">
                         <i class="fa-solid fa-tasks text-secondary text-xs"></i>
                         <span class="text-xs font-medium text-secondary">{{ $entry->task->title }}</span>
                     </div>
-                @endif
+                    <x-projects.task-status :status="$entry->task->status" />
+                    </div>
+                        @endif
             </div>
             
             <div class="flex flex-col items-end gap-2">

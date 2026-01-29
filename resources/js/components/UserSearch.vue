@@ -72,11 +72,23 @@ function toggleUser(user) {
       <div v-if="selectedUsers.length === 0" class="text-xs text-textcol2">No users selected</div>
 
       <div v-for="user in selectedUsers" :key="user.id"
-           class="flex items-center justify-between bg-slate-950/50 px-3 py-2 rounded-lg text-textcol">
+           class="flex items-center justify-between bg-slate-950/50 h-[40px] px-3 rounded-lg text-textcol">
         <span>{{ user.username }}</span>
         <button type="button"
                 @click="selectedUsers = selectedUsers.filter(u => u.id !== user.id)"
-                class="text-red-400 text-xs">Remove</button>
+                class="relatives text-xs scale-50% p-0 m-0 border-none bg-transparent cursor-pointer text-base transition-transform duration-200 ease-in-out group/trash scale-[0.45]">
+                <svg class="w-16 h-16 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-md overflow-visible group-hover/trash:scale-[1.08] group-hover/trash:rotate-[3deg] group-active:scale-[0.96] group-active:rotate-[-1deg]"
+                    viewBox="0 -10 64 74" xmlns="http://www.w3.org/2000/svg">
+                    <g id="trash-can">
+                        <rect x="16" y="24" width="32" height="30" rx="3" ry="3" fill="#01BAEF"></rect>
+                        <g transform-origin="12 18" id="lid-group"
+                            class="transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/trash:rotate-[-28deg] group-hover/trash:translate-y-[2px] group-active/trash:rotate-[-12deg] group-active:scale-[0.98]">
+                            <rect x="12" y="12" width="40" height="6" rx="2" ry="2" fill="#01BAEF"></rect>
+                            <rect x="26" y="8" width="12" height="4" rx="2" ry="2" fill="#01BAEF"></rect>
+                        </g>
+                    </g>
+                </svg>    
+        </button>
         <input type="hidden" name="users[]" :value="user.id">
       </div>
     </div>

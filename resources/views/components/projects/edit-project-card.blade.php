@@ -92,10 +92,13 @@
 
                     {{-- Delete project --}}
                     <div class="mt-8">
-                        <x-forms.button>
-                            <i class="fa-solid fa-trash mr-2 text-red-300"></i>
-                            <span class="text-red-300 font-bold">Delete Project</span>
-                        </x-forms.button>
+                        <form method="POST" action="{{ route('projects.destroy', $project) }}">
+                            @method('DELETE')
+                            <x-forms.button>
+                                <i class="fa-solid fa-trash mr-2 text-red-300"></i>
+                                <span class="text-red-300 font-bold">Delete Project</span>
+                            </x-forms.button>
+                        </form>
                     </div>
                 </div>
             </div>
