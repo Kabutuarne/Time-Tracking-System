@@ -4,26 +4,6 @@
     'role' => $role,
     'project' => $project,
 ])
-@php
-    //Role colors
-    $roleKey = strtolower($role);
-    $roleColors = [
-        'owner' => [
-            'tagBg' => 'bg-indigo-500/10',
-            'tagText' => 'text-indigo-400',
-        ],
-        'member' => [
-            'tagBg' => 'bg-green-500/10',
-            'tagText' => 'text-green-400',
-        ],
-        'manager' => [
-            'tagBg' => 'bg-yellow-500/10',
-            'tagText' => 'text-yellow-400',
-        ],
-    ];
-
-    $colors = $roleColors[$roleKey] ?? $roleColors['member'];
-@endphp
 <div class="group relative overflow-hidden rounded-xl bg-slate-950/40 ring-1 ring-white/5 transition-all duration-300 hover:ring-primary/30">
     <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-primary/10 to-secondary/0 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-70"></div>
     
@@ -39,13 +19,18 @@
                         <p class="text-xs text-slate-400 truncate">{{ $user->first_name }} {{ $user->last_name }}</p>
                 </div>
     </div>    
-<div class="flex items-center gap-1 rounded-full {{ $colors['tagBg'] }} px-2.5 py-1 shrink-0">
-    <span class="text-xs font-medium {{ $colors['tagText'] }} capitalize">{{ $role }}</span>
-</div>
-                              
+        @if ($role != 'owner' )
+            <form method="POST" action="{{ route('projects.users.update', [$project, $user]) }}" class="">
+            @csrf
+            @method('PUT')
+            <x-forms.select-dropdown
+            name="role"
+            :selected="$role"
+            :options="['manager' => 'Manager', 'member' => 'Member']"
+            onchange="this.form.submit()"/>
+            </form>
+        @endif                       
         </div>
-        
-
                                <div class="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
             <div class="flex items-center gap-4 text-xs">
                             <div class="flex items-center gap-1.5">
@@ -60,6 +45,11 @@
             </div>
             
             <x-forms.sm-button :href="route('users.show', $user)">View</x-forms.sm-button>
+                <form method="POST" action="{{ route('projects.users.destroy', [$project, $user]) }}">
+                                    @csrf
+                                    @method('DELETE')
+                                    <x-forms.sm-button :secondary="true">Remove</x-forms.sm-button>
+                </form>
         </div>
     </div>
 </div>

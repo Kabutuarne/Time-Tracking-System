@@ -58,10 +58,27 @@
                             class="{{ ($project->is_public ? 'fa-solid fa-globe' : 'fa-solid fa-lock') }} text-primary"></i>
                         <div class="flex flex-col">
                             <span class="text-xs font-semibold text-primary">Visibility</span>
-                            {{-- Users + the owner --}}
+                            {{-- Visibility --}}
                             <span
                                 class="text-sm font-semibold text-textcol">{{ ($project->is_public ? 'Public' : 'Private') }}</span>
-
+                        </div>
+                    </div>
+                    {{-- status --}}
+                    <div class="flex items-center gap-2 rounded-xl bg-secondary/10 px-4 py-2">
+                        @if ($project->status === 'active')
+                            <i class="fas fa-play text-secondary"></i>
+                        @elseif ($project->status === 'on-hold')
+                            <i class="fas fa-gear text-secondary"></i>
+                        @elseif ($project->status === 'finished')
+                            <i class="fas fa-circle-check text-secondary"></i>
+                        @elseif ($project->status === 'archived')
+                            <i class="fas fa-circle-info text-secondary"></i>
+                        @else
+                            <i class="fas fa-gear text-secondary"></i>
+                        @endif
+                        <div class="flex flex-col">
+                            <span class="text-xs font-semibold text-secondary">Project status</span>
+                            <span class="text-sm font-semibold text-textcol">{{ ucfirst($project->status)  }}</span>
                         </div>
                     </div>
                 </div>
@@ -78,9 +95,6 @@
                     {{-- @if (auth()->user()->is($project->user) || auth()->user()->isManagerOf($project)) --}}
                     <x-forms.button :secondary="true" :href="route('projects.edit', $project)">
                         <i class="fa-solid fa-edit mr-2"></i>Edit Project
-                    </x-forms.button>
-                    <x-forms.button :secondary="true" :href="route('users.index', $project)">
-                        <i class="fas fa-user-plus mr-2"></i>Add Member
                     </x-forms.button>
                     {{-- @endif --}}
                 </div>
@@ -126,10 +140,12 @@
                 <div class="mt-8">
                     <h2 class="text-2xl font-bold text-textcol mb-4">Team Members</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        <x-projects.user-card :user="$project->user" role="owner" :userStats="$userStats" />
+                        <x-projects.user-card :user="$project->user" :project="$project" role="owner"
+                            :userStats="$userStats" />
 
                         @foreach ($project->users as $user)
-                            <x-projects.user-card :user="$user" role="{{ $user->pivot->role }}" :userStats="$userStats" />
+                            <x-projects.user-card :user="$user" :project="$project" role="{{ $user->pivot->role }}"
+                                :userStats="$userStats" />
                         @endforeach
                     </div>
 

@@ -1,0 +1,104 @@
+<div class="relative min-h-screen w-full bg-darker overflow-hidden">
+    <div class="relative mx-auto max-w-7xl px-6 py-16">
+        <div class="rounded-3xl bg-darker shadow-2xl ring-1 ring-white/5">
+
+            {{-- Header --}}
+            <div class="border-b border-white/5 p-10">
+                <h1 class="text-4xl font-bold text-textcol">
+                    Edit Project
+                </h1>
+                <p class="mt-2 text-textcol2">
+                    Change project details and manage members.
+                </p>
+            </div>
+
+            <div class="p-10 space-y-10">
+
+                {{-- Project settings --}}
+                <div>
+                    <form method="POST" action="{{ route('projects.update', $project) }}"
+                        class="grid grid-cols-2 gap-8">
+                        @csrf
+                        @method('PUT')
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Title</label>
+                                <x-forms.input class="w-[100%]" type="text" name="title"
+                                    value="{{ old('title', $project->title) }}" required />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Description</label>
+                                <x-forms.textarea class="w-[100%]" name="description" rows="4">
+                                    {{ old('description', $project->description) }}
+                                </x-forms.textarea>
+                            </div>
+
+                            <div class="flex justify-between">
+
+                                <div>
+                                    <label class="block text-sm font-medium text-textcol">Visibility</label>
+                                    <x-forms.select-dropdown name="is_public" :selected="$project->is_public"
+                                        :options="['0' => 'Private', '1' => 'Public']" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-textcol">Status</label>
+                                    <x-forms.select-dropdown name="status" :selected="$project->status"
+                                        :options="['active' => 'Active', 'on-hold' => 'On Hold', 'finished' => 'Finished']" />
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between">
+                                <x-forms.button>
+                                    <i class="fa-solid fa-save mr-2"></i>Save Changes
+                                </x-forms.button>
+
+                                <x-forms.button :secondary="true" href="{{ route('projects.show', $project) }}">
+                                    <i class="fa-solid fa-cancel mr-2"></i>Cancel
+                                </x-forms.button>
+                            </div>
+                        </div>
+                        <div class="w-full max-w-md">
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Add New Members</label>
+                                <div id="user-search"
+                                    data-selected-users='@json(old("users") ?? ($project->users->pluck("id") ?? []))'>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+
+                </div>
+
+                {{-- Members Section --}}
+                <div>
+                    <div class="flex items-start justify-between gap-6 mb-6">
+                        <h2 class="text-2xl font-bold text-textcol mt-2">Team Members</h2>
+                    </div>
+
+                    {{-- User cards grid --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                        <x-projects.user-card :user="$project->user" :project="$project" role="owner"
+                            :userStats="$userStats" />
+
+                        @foreach ($project->users as $user)
+                            <div class="relative">
+                                <x-projects.user-edit-card :user="$user" :project="$project" role="{{ $user->pivot->role }}"
+                                    :userStats="$userStats" />
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Delete project --}}
+                    <div class="mt-8">
+                        <x-forms.button>
+                            <i class="fa-solid fa-trash mr-2 text-red-300"></i>
+                            <span class="text-red-300 font-bold">Delete Project</span>
+                        </x-forms.button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

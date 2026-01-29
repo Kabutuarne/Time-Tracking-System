@@ -18,11 +18,11 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => fake()->company(),
+            'title' => fake()->word(),
             'description' => fake()->paragraph(),
             // 'user_id' => User::factory(),
             'user_id' => null, // will be set in the seeder
-            'status' => fake()->randomElement(['active', 'completed', 'on-hold', 'archived']),
+            'status' => fake()->randomElement(['active', 'finished', 'on-hold', 'archived']),
             'is_public' => fake()->boolean(30), // 30% to be true
         ];
     }

@@ -54,7 +54,7 @@
                             </div>
 
                             {{-- due date --}}
-                            <div class="y-5">
+                            <div>
                                 <label class="block text-sm font-semibold text-textcol2 mb-2">Due date (optional)</label>
                                 <x-forms.datetime-picker
                                     name="due_date"
@@ -66,7 +66,7 @@
                             {{-- status --}}
                             <div>
                                 <label class="block text-sm font-semibold text-textcol2 mb-2">Status</label>
-                                <select
+                                {{-- <select
                                     name="status"
                                     class="rounded-xl bg-slate-950/50 border border-white/10 px-4 py-3 text-textcol focus:outline-none focus:ring-2 focus:ring-primary"
                                 >
@@ -75,7 +75,9 @@
                                             {{ $label }}
                                         </option>
                                     @endforeach
-                                </select>
+                                </select> --}}
+                                <x-forms.select-dropdown name="status" :selected="$task->status"
+                                        :options="['in_progress' => 'In Progress', 'completed' => 'Completed', 'archived' => 'Archived']" />
                             </div>
 
                         </div>

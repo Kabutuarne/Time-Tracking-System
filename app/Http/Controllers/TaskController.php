@@ -53,7 +53,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
-            'due_date' => 'nullable|datetime|after:datetime:now',
+            'due_date' => 'nullable|after:datetime:now',
         ]);
 
         $task = new Task($validated);
@@ -134,7 +134,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:100',
             'description' => 'nullable|string|max:255',
-            'due_date' => 'nullable|date',
+            'due_date' => 'nullable|after:datetime:now',
             'status' => 'required|in:in_progress,completed,archived',
         ]);
 
@@ -153,6 +153,6 @@ class TaskController extends Controller
     {
         abort_unless($task->project_id === $project->id, 404);
         $task->delete();
-        return back()->with('success', 'Entry removed.');
+        return back();
     }
 }

@@ -16,9 +16,11 @@ return new class extends Migration
             $table->timestamps();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('status', ['active', 'completed', 'on-hold', 'archived'])->default('active');
+            $table->enum('status', ['active', 'finished', 'on-hold', 'archived'])->default('active');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // project creator/owner
             $table->boolean('is_public')->default(false);
+
+            $table->index(['title']);
         });
     }
 

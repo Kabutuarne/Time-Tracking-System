@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Entry;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class ProjectController extends Controller
      * Show the form for creating a new resource.
      */
     public function create()
-    {
+    {  
         return view('projects.create');
     }
 
@@ -39,7 +40,31 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        return redirect()->route('projects.index');
+        // validate inputs
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_public' => 'required|boolean',
+            'users' => 'nullable|array',
+            'users.*' => 'exists:users,id',
+        ]);
+
+        // create the project
+        $project = Project::create([
+            'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
+            'is_public' => $validated['is_public'],
+            // 'user_id' => auth()->id, // owner
+            'user_id' => 1, // for testing purposes rn
+        ]);
+
+        // attach selected users (if any)
+        if (!empty($validated['users'])) {
+            $project->users()->attach($validated['users'], ['role' => 'member']);
+        }
+
+        // redirect
+        return redirect()->route('projects.show', $project);
     }
 
     /**
@@ -99,22 +124,59 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        return view('projects.edit');
+        // Authorization check
+        // if ($project->user_id !== auth()->id() && !$project->users()->wherePivot('role', 'manager')->where('user_id', auth()->id())->exists()) {
+        //     abort(403);
+        // }
+
+        // Get user stats
+        $userStats = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->where('tasks.project_id', $project->id)
+            ->select(
+                'entries.user_id',
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy('entries.user_id')
+            ->get()
+            ->keyBy('user_id');
+
+        return view('projects.edit', compact('project', 'userStats'));
     }
+
 
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Project $project)
     {
-        //
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'is_public' => 'required|in:0,1',
+            'status' => 'required', Rule::in(['on-hold', 'finished', 'active'])
+        ]);
+        $data['is_public'] = (int) $data['is_public'];
+        // stores or updates users(members of the project)
+        $selectedUsers = $request->input('users', []);
+        if (!empty($selectedUsers)) {
+            $project->users()->attach($selectedUsers, ['role' => 'member']);
+        }
+
+        $project->update($data);
+
+        return redirect()
+            ->route('projects.show', $project);
     }
+
 
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(Project $project)
     {
-        //
+        $project->delete();
+        return back();
     }
 }

@@ -5,7 +5,7 @@
 @php
     if ($type === 'members') {
         $icon = 'fa-solid fa-users';
-        $count = $project->users_count;
+        $count = $project->users_count + 1; // add owner
         $slot = 'Members';
         $color = 'text-primary';
         $bg = 'bg-primary/10';
