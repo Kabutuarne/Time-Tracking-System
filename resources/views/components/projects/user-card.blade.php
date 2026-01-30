@@ -1,8 +1,8 @@
 @props([
-    'user' => $user,
-    'userStats' => $userStats,
-    'role' => $role,
-    'project' => $project,
+    'user',
+    'userStats',
+    'role',
+    'project',
 ])
 @php
     //Role colors

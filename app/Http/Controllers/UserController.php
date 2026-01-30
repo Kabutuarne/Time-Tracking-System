@@ -69,7 +69,7 @@ class UserController extends Controller
     public function attachToProject(Request $request, Project $project)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => ['required', 'exists:users,id'],
         ]);
 
         $user = User::findOrFail($request->user_id);

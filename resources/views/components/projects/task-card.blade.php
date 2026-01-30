@@ -37,15 +37,12 @@
 
         @if($task->status === 'completed')
             {{-- Can set active or archive only Manager and Owner --}}
-            <x-forms.sm-button :secondary="true" href="{{ route('projects.tasks.complete', [$project, $task]) }}">
-                Set Active
-            </x-forms.sm-button>
             <x-forms.sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}">
                 Archive Task
             </x-forms.sm-button>
         @elseif($task->status === 'in_progress')
             {{-- Will be able to set completed in the entry --}}
-            <x-forms.sm-button :secondary="true" href="{{ route('projects.tasks.complete', [$project, $task]) }}">
+            <x-forms.sm-button :secondary="true" href="{{ route('projects.tasks.entries.create', [$project, $task]) }}">
                 Add Entry
             </x-forms.sm-button>
             {{-- Can archive only Manager and Owner --}}

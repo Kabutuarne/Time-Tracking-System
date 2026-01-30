@@ -1,5 +1,5 @@
 @props([
-    'project' => $project
+    'project'
 ])
 @auth
     @if($project->users->contains(auth()->user()))

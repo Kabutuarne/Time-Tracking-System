@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->date('work_date');
             $table->integer('minutes'); // stored in minutes
-            $table->text('description')->nullable();
+            $table->text('description', 255);
             $table->timestamps();
         });
     }

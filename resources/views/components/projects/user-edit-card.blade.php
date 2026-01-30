@@ -1,8 +1,8 @@
 @props([
-    'user' => $user,
-    'userStats' => $userStats,
-    'role' => $role,
-    'project' => $project,
+    'user',
+    'userStats',
+    'role',
+    'project',
 ])
 <div class="group relative overflow-hidden rounded-xl bg-slate-950/40 ring-1 ring-white/5 transition-all duration-300 hover:ring-primary/30">
     <div class="absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br from-primary/10 to-secondary/0 blur-2xl transition-all duration-500 group-hover:scale-150 group-hover:opacity-70"></div>

@@ -21,18 +21,19 @@ class TaskController extends Controller
     /**
      * Mark the specified task as completed.
      */
-    public function complete(Project $project, Task $task)
-    {
-        abort_unless($task->project_id === $project->id, 404);
-        $user = Auth::id();
+    // Made it a method instead
+    // public function complete(Project $project, Task $task)
+    // {
+    //     abort_unless($task->project_id === $project->id, 404);
+    //     $user = Auth::id();
 
-        $task->completed_at = now();
-        $task->completed_by = $user;
-        $task->status = 'completed';
-        $task->save();
+    //     $task->completed_at = now();
+    //     $task->completed_by = $user;
+    //     $task->status = 'completed';
+    //     $task->save();
 
-        return redirect()->back()->with('success', 'Task marked as completed.');
-    }
+    //     return redirect()->back()->with('success', 'Task marked as completed.');
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -51,9 +52,9 @@ class TaskController extends Controller
         
         // must authentificate user before allowing to create task | later
         $validated = $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
-            'due_date' => 'nullable|after:datetime:now',
+            'title' => ['required','string','max:100'],
+            'description' => ['nullable','string','max:255'],
+            'due_date' => ['nullable','after:datetime:now'],
         ]);
 
         $task = new Task($validated);
@@ -132,10 +133,10 @@ class TaskController extends Controller
         abort_unless($task->project_id === $project->id, 404);
 
         $validated = $request->validate([
-            'title' => 'required|string|max:100',
-            'description' => 'nullable|string|max:255',
-            'due_date' => 'nullable|after:datetime:now',
-            'status' => 'required|in:in_progress,completed,archived',
+            'title' => ['required','string','max:100'],
+            'description' => ['nullable','string','max:255'],
+            'due_date' => ['nullable','after:datetime:now'],
+            'status' => ['required','in:in_progress,completed,archived'],
         ]);
 
         $task->update($validated);

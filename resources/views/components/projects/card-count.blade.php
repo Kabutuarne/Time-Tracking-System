@@ -1,6 +1,6 @@
 @props([
-    'project' => $project,
-    'type' => $type,
+    'project',
+    'type',
 ])
 @php
     if ($type === 'members') {

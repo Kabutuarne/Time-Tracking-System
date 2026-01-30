@@ -17,7 +17,7 @@
             {{-- header --}}
             <div class="border-b border-white/5 p-10">
                 <h1 class="text-4xl font-bold text-textcol">
-                    Add Entry
+                    Edit Entry
                 </h1>
 
                 <div class="mt-4 space-y-1">
@@ -60,14 +60,9 @@
                                 class="w-full"
                                 limit="255"
                             >
-                                {{ old('description') }}
+                                {{ old('description', $entry->description) }}
                             </x-forms.textarea>
                             <x-forms.input-error :messages="$errors->get('description')" class="mt-2" />
-                        </div>
-                        <div class="mt-4">
-                            <x-forms.checkmark name="mark_complete">
-                                Mark task as completed with this entry
-                            </x-forms.checkmark>
                         </div>
                     </div>
                     <div>
@@ -78,7 +73,7 @@
                             </label>
                             <x-forms.datetime-picker
                                 name="work_date"
-                                value="{{ now()->format('Y-m-d\TH:i') }}"
+                                value="{{ $entry ? now()->format('Y-m-d\TH:i') : $entry->description}}"
                                 required
                             />
                             <x-forms.input-error :messages="$errors->get('work_date')" class="mt-2" />
@@ -93,7 +88,8 @@
                                 name="minutes"
                                 :min="5" 
                                 :max="480" 
-                                :step="5" 
+                                :step="5"
+                                :value="$entry->minutes"
                             />
                             <x-forms.input-error :messages="$errors->get('minutes')" class="mt-2" />
                         </div>
@@ -105,7 +101,7 @@
                         </x-forms.button>
 
                         <x-forms.button :secondary="true">
-                            <i class="fas fa-save mr-2"></i>Save Entry
+                            <i class="fas fa-save mr-2"></i>Save Changes
                         </x-forms.button>
                     </div>
                 </form>

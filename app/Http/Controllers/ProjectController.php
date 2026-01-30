@@ -42,11 +42,11 @@ class ProjectController extends Controller
     {
         // validate inputs
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_public' => 'required|boolean',
-            'users' => 'nullable|array',
-            'users.*' => 'exists:users,id',
+            'title' => ['required|string','max:100'],
+            'description' => ['nullable','string','max:255'],
+            'is_public' => ['required','boolean'],
+            'users' => ['nullable','array'],
+            'users.*' => ['exists:users,id'],
         ]);
 
         // create the project
@@ -152,10 +152,10 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'is_public' => 'required|in:0,1',
-            'status' => 'required', Rule::in(['on-hold', 'finished', 'active'])
+            'title' => ['required', 'string', 'max:100'],
+            'description' => ['nullable', 'string', 'max:255'],
+            'is_public' => ['required', 'in:0,1'],
+            'status' => ['required', Rule::in(['on-hold', 'finished', 'active'])]
         ]);
         $data['is_public'] = (int) $data['is_public'];
         // stores or updates users(members of the project)

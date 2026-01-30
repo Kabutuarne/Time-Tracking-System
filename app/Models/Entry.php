@@ -16,6 +16,8 @@ class Entry extends Model
         'task_id',
         'user_id',
         'title',
+        'work_date',
+        'minutes',
         'description',
     ];
 
