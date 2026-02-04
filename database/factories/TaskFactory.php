@@ -25,7 +25,7 @@ class TaskFactory extends Factory
             'due_date' => fake()->optional()->dateTimeBetween('now', '+1 year'),
             'completed_at' => null,
             'completed_by' => null,
-            'status' => 'in_progress',
+            'status' => fake()->randomElement(['in_progress', 'archived', 'completed']),
         ];
     }
 }

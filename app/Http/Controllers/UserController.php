@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Entry;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -37,8 +40,63 @@ class UserController extends Controller
      * Display the specified resource.
      */
     public function show(User $user)
-    {
-        //
+    { 
+        // eager load other tables
+        Project::withCount(['users', 'tasks'])
+       ->with('tasks:id,project_id,status');
+
+        // get owned projects
+         $ownedProjects = Project::query()
+            ->where('user_id', $user->id)
+            ->withCount(['tasks', 'entries'])
+            ->latest()
+            ->get();
+        
+        // get projects the user is a part of
+        $memberProjects = Project::query()
+            ->whereHas('users', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })
+            ->where('user_id', '!=', $user->id)
+            ->withCount(['tasks', 'entries'])
+            ->latest()
+            ->get();
+        
+        // statistics data
+        $start = now()->subDays(6)->startOfDay();
+        $end   = now()->endOfDay();
+
+        $weeklyWork = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->join('projects', 'projects.id', '=', 'tasks.project_id')
+            ->where('entries.user_id', '=', $user->id)
+            ->whereBetween(
+                DB::raw('DATE(entries.work_date)'),
+                [$start->toDateString(), $end->toDateString()]
+            )
+            ->select(
+                DB::raw('DATE(entries.work_date) as work_date'),
+                'projects.id as project_id',
+                'projects.title as project_title',
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy(
+                DB::raw('DATE(entries.work_date)'),
+                'projects.id',
+                'projects.title'
+            )
+            ->orderBy('work_date')
+            ->get();
+        // dd($weeklyWork);
+        
+        return view('users.show', [
+            'user'           => $user,
+            'ownedProjects'  => $ownedProjects,
+            'memberProjects' => $memberProjects,
+            'weeklyWork' => $weeklyWork,
+        ]);
+
+
     }
 
     /**

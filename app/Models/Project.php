@@ -12,13 +12,15 @@ class Project extends Model
     /** @use HasFactory<\Database\Factories\ProjectFactory> */
     use HasFactory;
 
-    protected $fillable = [
-        'title',
-        'description',
-        'user_id',
-        'status',
-        'is_public'
-    ];
+    // protected $fillable = [
+    //     'title',
+    //     'description',
+    //     'user_id',
+    //     'status',
+    //     'is_public'
+    // ];
+    protected $guarded = [];
+    
     public function user()
         {
             return $this->belongsTo(User::class);

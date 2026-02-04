@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Task;
 use App\Models\User;
 use App\Models\Entry;
 use App\Models\Project;
@@ -17,15 +19,20 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        //fixed n+1 problem and optimized entries count query
-        $projects = Project::with('user')
-            ->withCount(['users', 'tasks'])
-            // selectRaw adds a subquery to count entries
-            ->selectRaw('projects.*, (SELECT count(*) FROM entries WHERE task_id IN (SELECT id FROM tasks WHERE tasks.project_id = projects.id)) AS entries_count')
+        // improved readability
+        $projects = Project::query()
+            ->with('user')
+            ->withCount([
+                'users',
+                'tasks',
+                'entries',
+            ])
+            ->latest()
             ->get();
-        
+
         return view('projects.index', compact('projects'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -98,25 +105,83 @@ class ProjectController extends Controller
             ->select(
                 'projects.id',
                 DB::raw('COUNT(DISTINCT tasks.id) as total_task_count'), // total task count
-                DB::raw('COALESCE(SUM(entries.minutes), 0) as total_minutes'), // total minutes from all entries
+                DB::raw('COALESCE(SUM(entries.minutes), 0) as total_minutes'), // total minutes
                 DB::raw('COUNT(entries.id) as total_entry_count') // total entry count
             )
             ->groupBy('projects.id')
             ->get()
             ->keyBy('id');
 
+        // Weekly user stats for "Weekly Effort" and "Entries" tabs
+        $weeklyUserStats = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->join('users', 'users.id', '=', 'entries.user_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [
+                now()->startOfWeek(),
+                now()->endOfWeek()
+            ])
+            ->select(
+                'entries.user_id',
+                DB::raw('SUM(entries.minutes) as total_minutes'),
+                DB::raw('COUNT(entries.id) as entry_count')
+            )
+            ->groupBy('entries.user_id')
+            ->get()
+            ->map(function ($stat) {
+                $stat->user = User::find($stat->user_id);
+                return $stat;
+            });
+
+        // Task status stats for "Tasks" tab (for donut chart) without archived ones
+        $taskStatusStats = Task::query()
+            ->where('project_id', $project->id)
+            ->where('status', '!=', 'archived')
+            ->select(
+                'status',
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('status')
+            ->get();
+        // Total time per task (for bar chart)
+        $taskTimeStats = Task::query()
+            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
+            ->where('tasks.project_id', $project->id)
+            ->select(
+                'tasks.title',
+                DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
+            )
+            ->groupBy('tasks.id', 'tasks.title')
+            ->orderByDesc('minutes')
+            ->get();
+
+
         // entry pagination
-        $entries = $project->entries()->latest()
+        $entries = $project->entries()
+            ->latest()
             ->with(['user', 'task', 'project'])
             ->paginate(5, ['*'], 'entries_page');
+
         // task pagination
-        $tasks = $project->tasks()->latest()
+        $tasks = $project->tasks()
+            ->latest()
             ->with('project')
             ->paginate(5, ['*'], 'tasks_page');
 
-        return view('projects.show', compact('project', 'userStats', 'entries', 'tasks', 'projectStats'));
+        return view(
+            'projects.show',
+            compact(
+                'project',
+                'userStats',
+                'entries',
+                'tasks',
+                'projectStats',
+                'weeklyUserStats',
+                'taskStatusStats',
+                'taskTimeStats'
+            )
+        );
     }
-
 
 
     /**

@@ -20,7 +20,8 @@ class Entry extends Model
         'minutes',
         'description',
     ];
-
+    protected $guarded = [];
+    
     public function task(){
         return $this->belongsTo(Task::class);
     }

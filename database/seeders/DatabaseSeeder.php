@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         //User::factory(10)->create();
-        $users = User::factory(50)->create();
+        $users = User::factory(10)->create();
 
         // make projects with members 
         Project::factory()
@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
 
                 //entries for each task
                 foreach ($tasks as $task){
-                    Entry::factory(rand(1,5))
+                    Entry::factory(rand(4,10))
                         ->make([
                             'task_id' => $task->id,
                             'user_id' => $project->users->random()->id,

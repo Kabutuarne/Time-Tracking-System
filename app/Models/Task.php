@@ -11,14 +11,16 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
     
-    protected $fillable = [
-        'title',
-        'description',
-        'project_id',
-        'due_date',
-        'completed_at',
-        'status',
-    ];
+    // protected $fillable = [
+    //     'title',
+    //     'description',
+    //     'project_id',
+    //     'due_date',
+    //     'completed_at',
+    //     'status',
+    // ];
+    protected $guarded = [];
+
     // lets me use isToday and isPast methods on due_date and completed_at
     protected $casts = [
         'due_date' => 'datetime',

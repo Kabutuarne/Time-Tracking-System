@@ -36,11 +36,12 @@ class EntryController extends Controller
      */
     public function store(Project $project, Task $task, Request $request)
     {
+    
         $validated = $request->validate([
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'description' => ['required', 'string', 'max:255'],
-            'mark_complete' => Rule::in(true, false),
+            'mark_complete' => ['nullable', 'boolean'],
         ]);
 
         Entry::create([
@@ -51,12 +52,12 @@ class EntryController extends Controller
             'minutes' => $validated['minutes'],
             'description' => $validated['description'] ?? null,
         ]);
-        if('mark_complete'){
+        if ($request->boolean('mark_complete')) {
             // $task->markComplete(Auth::id());
             $task->markComplete(1);
         }
         return redirect()
-            ->route('projects.show', $task->project);
+            ->route('projects.show', $project);
     }
 
     /**
@@ -70,17 +71,24 @@ class EntryController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Entry $entry)
+    public function edit(Project $project, Task $task, Entry $entry)
     {
-        //
+        return view('entries.edit', compact( 'project','task','entry'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Entry $entry)
+    public function update(Request $request, Project $project, Task $task, Entry $entry)
     {
-        //
+        $validated = $request->validate([
+            'work_date' => ['required', 'date'],
+            'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
+            'description' => ['required', 'string', 'max:255'],
+        ]);
+        $entry->update($validated);
+        return redirect()
+            ->route('projects.show', $project);
     }
 
     /**

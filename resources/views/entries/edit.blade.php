@@ -1,5 +1,6 @@
 <x-layout>
-    <x-slot:title>Entry Creation</x-slot:title>
+    <x-slot:title>Edit Entry</x-slot:title>
+
     <div class="relative min-h-screen w-full bg-darker overflow-hidden">
         <div
             class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/0 blur-3xl">
@@ -14,7 +15,7 @@
                 {{-- header --}}
                 <div class="border-b border-white/5 p-10">
                     <h1 class="text-4xl font-bold text-textcol">
-                        Add Entry
+                        Edit Entry
                     </h1>
 
                     <div class="mt-4 space-y-1">
@@ -22,26 +23,28 @@
                             Project
                         </p>
                         <p class="text-lg font-semibold text-textcol">
-                            {{ $task->project->title }}
+                            {{ $entry->project->title }}
                         </p>
 
                         <p class="mt-3 text-sm text-textcol2">
                             Task
                         </p>
                         <p class="text-lg font-semibold text-textcol">
-                            {{ $task->title }}
+                            {{ $entry->task->title }}
                         </p>
                     </div>
                 </div>
 
                 {{-- form --}}
                 <div class="p-10">
-                    <form method="POST" action="{{ route('projects.tasks.entries.store', [
+                    <form method="POST" action="{{ route('projects.tasks.entries.update', [
     'project' => $project,
     'task' => $task,
+    'entry' => $entry,
 ]) }}">
+                        @csrf
+                        @method('PUT')
                         <div class="flex justify-between">
-                            @csrf
                             <div>
                                 {{-- description --}}
                                 <div class="mt-4 w-[500px]">
@@ -50,14 +53,9 @@
                                     </label>
                                     <x-forms.textarea name="description" rows="4"
                                         placeholder="What did you actually do?" class="w-full" limit="255">
-                                        {{ old('description') }}
+                                        {{ old('description', $entry->description) }}
                                     </x-forms.textarea>
                                     <x-forms.input-error :messages="$errors->get('description')" class="mt-2" />
-                                </div>
-                                <div class="mt-4">
-                                    <x-forms.checkmark name="mark_complete">
-                                        Mark task as completed with this entry
-                                    </x-forms.checkmark>
                                 </div>
                             </div>
                             <div>
@@ -66,7 +64,8 @@
                                     <label class="block text-sm font-semibold text-textcol2 mb-2">
                                         Work Date
                                     </label>
-                                    <x-forms.datetime-picker name="work_date" value="{{ now()->format('Y-m-d\TH:i') }}"
+                                    <x-forms.datetime-picker name="work_date"
+                                        value="{{ $entry ? now()->format('Y-m-d\TH:i') : $entry->description}}"
                                         required />
                                     <x-forms.input-error :messages="$errors->get('work_date')" class="mt-2" />
                                 </div>
@@ -76,7 +75,8 @@
                                     <label class="block text-sm font-semibold text-textcol2 mb-2">
                                         Minutes Worked
                                     </label>
-                                    <x-forms.minute-picker name="minutes" :min="5" :max="480" :step="5" />
+                                    <x-forms.minute-picker name="minutes" :min="5" :max="480" :step="5"
+                                        :value="$entry->minutes" />
                                     <x-forms.input-error :messages="$errors->get('minutes')" class="mt-2" />
                                 </div>
                             </div>
@@ -87,7 +87,7 @@
                             </x-forms.button>
 
                             <x-forms.button :secondary="true">
-                                <i class="fas fa-save mr-2"></i>Save Entry
+                                <i class="fas fa-save mr-2"></i>Save Changes
                             </x-forms.button>
                         </div>
                     </form>
@@ -96,5 +96,4 @@
             </div>
         </div>
     </div>
-
 </x-layout>

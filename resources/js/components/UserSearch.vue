@@ -5,7 +5,7 @@ import axios from 'axios'
 const el = document.getElementById('user-search')
 if (!el) throw new Error('UserSearch mount element not found')
 
-// Start empty: only track newly added users
+//only track newly added users
 const selectedUsers = ref([])
 
 const query = ref('')

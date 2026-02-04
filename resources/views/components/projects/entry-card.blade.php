@@ -34,7 +34,7 @@
                     </div>
                     <x-projects.task-status :status="$entry->task->status" />
                     </div>
-                        @endif
+                @endif
             </div>
             
             <div class="flex flex-col items-end gap-2">
@@ -49,16 +49,22 @@
         
         <div class="mt-4 flex items-left gap-2 border-t border-white/5 pt-3">
             {{-- Allows editing and deleting entries only for Managers, entry creators or project owners --}}
-            @auth
-              @if (auth()->user()->is($entry->user) || auth()->user()->isManagerOf($entry->project) || auth()->user()->is($entry->project->user))
-                  <x-forms.sm-button :href="route('projects.tasks.entries.edit', $entry)">
+             {{-- @if (auth()->user()->is($entry->user) || auth()->user()->isManagerOf($entry->project) || auth()->user()->is($entry->project->user)) --}}
+                  <x-forms.sm-button 
+                    href="{{ route('projects.tasks.entries.edit', [
+                        'project' => $entry->project,
+                        'task' => $entry->task,
+                        'entry' => $entry
+                    ]) }}"
+                >
                     Edit Entry
                 </x-forms.sm-button>
-                <x-forms.sm-button :href="route('projects.tasks.entries.show', $entry)">
+
+                <x-forms.sm-button>
                     Delete Entry
                 </x-forms.sm-button>
-              @endif  
-            @endauth
+              {{-- @endif   --}}
+            {{-- @endauth --}}
             
         </div>
     </div>
