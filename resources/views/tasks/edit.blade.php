@@ -124,7 +124,7 @@
                     <div class="space-y-4">
                         @forelse ($entries as $entry)
                             <div class="relative">
-                                <x-projects.entry-card :entry="$entry" />
+                                <x-projects.entry-card :entry="$entry" :project="$task->project" />
 
                                 <form method="POST"
                                       action="{{ route('projects.tasks.entries.destroy', [$task->project, $task, $entry]) }}"

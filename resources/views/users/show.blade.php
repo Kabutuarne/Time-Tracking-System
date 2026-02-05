@@ -58,7 +58,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
                                 <h3 class="text-lg font-semibold text-textcol mb-4">Account</h3>
-                                <ul class="space-y-2 text-sm text-textcol2">
+                                <ul class="space-y-2 text-textcol2">
                                     <li><strong class="text-textcol">Full name </strong> {{ $user->first_name }}
                                         {{ $user->last_name }}
                                     </li>
@@ -70,13 +70,22 @@
 
                             <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
                                 <h3 class="text-lg font-semibold text-textcol mb-4">Actions</h3>
-                                <div class="flex flex-wrap gap-3">
+                                <div class="grid grid-cols-1 gap-3">
+                                    <x-forms.button href="{{ route('users.edit', $user) }}">
+                                        <i class="fas fa-edit mr-2"></i> Edit Profile
+                                    </x-forms.button>
                                     <x-forms.button href="#">
-                                        Edit Profile
+                                        <i class="fas fa-key mr-2"></i> Change Password
                                     </x-forms.button>
-                                    <x-forms.button :secondary="true" href="#">
-                                        Change Password
-                                    </x-forms.button>
+                                    <form method="POST" action="{{ route('users.destroy', $user) }}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <x-forms.button>
+                                            <i class="fa-solid fa-trash mr-2 text-red-300"></i>
+                                            <span class="text-red-300 font-bold">Delete Account</span>
+                                        </x-forms.button>
+                                    </form>
+
                                 </div>
                             </div>
                         </div>
@@ -92,7 +101,7 @@
                                 <h2 class="text-2xl font-bold text-textcol">Owned Projects</h2>
 
                                 @forelse ($ownedProjects as $project)
-                                    <x-users.compact-project-card :project="$project" />
+                                    <x-users.compact-project-card :project="$project" :user="$user" :owned="true" />
                                 @empty
                                     <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
                                         <p class="text-slate-400 text-sm">You have not created any projects.</p>
@@ -105,7 +114,7 @@
                                 <h2 class="text-2xl font-bold text-textcol">Part of Projects </h2>
 
                                 @forelse ($memberProjects as $project)
-                                    <x-users.compact-project-card :project="$project" />
+                                    <x-users.compact-project-card :project="$project" :user="$user" />
                                 @empty
                                     <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
                                         <p class="text-slate-400 text-sm">You are not part of any projects.</p>

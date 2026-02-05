@@ -1,14 +1,7 @@
 <x-guest-layout>
     <div class="flex items-center justify-center min-h-[80vh]">
         <article class="w-full max-w-md group/card">
-            <div class="relative rounded-xl bg-dark p-8 shadow-xl transition-all duration-300">
-                <!-- Gradient glow that appears on hover -->
-                <div
-                    class="absolute inset-0 rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 blur-sm -z-10">
-                </div>
-                <div
-                    class="absolute inset-[-2px] rounded-xl bg-gradient-to-r from-primary via-secondary to-primary opacity-0 group-hover/card:opacity-100 group-hover/card:animate-background group-hover/card:bg-[length:400%_400%] group-hover/card:[animation-duration:_4s] transition-opacity duration-300 -z-10">
-                </div>
+            <div class="relative rounded-xl bg-slate-950/40 p-8 shadow-xl transition-all duration-300">
                 <h2
                     class="text-2xl font-bold text-center mb-8 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                     Welcome Back

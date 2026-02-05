@@ -1,4 +1,8 @@
-@props(['project'])
+@props([
+    'project',
+    'user',
+    'owned' => false
+])
 
 <div
     class="group relative overflow-hidden rounded-lg bg-slate-950/40 ring-1 ring-white/5 transition hover:ring-primary/30 w-full max-w-[520px]">
@@ -34,10 +38,21 @@
         </div>
 
         {{-- actions --}}
-        <div class="flex justify-end border-t border-white/5 pt-3">
-            <x-forms.sm-button :secondary="false" :href="route('projects.show', $project)">
+        <div class="flex justify-end gap-3">
+
+            <x-forms.sm-button :href="route('projects.show', $project)">
                 View
             </x-forms.sm-button>
+            @if(!$owned)
+                <form method="POST" action="{{ route('projects.users.destroy', [$project, $user]) }}">
+                    @csrf
+                    @method('DELETE')
+
+                    <x-forms.sm-button :secondary="true">
+                        Leave
+                    </x-forms.sm-button>
+                </form>
+            @endif
         </div>
     </div>
 </div>

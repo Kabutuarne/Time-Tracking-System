@@ -1,5 +1,6 @@
 @props([
     'entry',
+    'project'
 ])
 
 <div class="group relative rounded-xl bg-slate-950/40 ring-1 ring-white/5 transition-all duration-300 hover:ring-primary/30">
@@ -16,7 +17,16 @@
                             </span>
                         </div>
                         <div>
-                            <p class="text-sm font-medium text-textcol">{{ $entry->user->username }}</p>
+                            @if ($project->users->contains($entry->user))
+                                <p class="text-sm font-medium text-textcol">
+                                    {{ $entry->user->username }}
+                                </p>
+                            @else
+                                <p class="text-sm font-medium italic text-primary/100">
+                                    {{ $entry->user->username }}*
+                                </p>
+                            @endif
+                            
                             <p class="text-xs text-slate-400">{{ $entry->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>

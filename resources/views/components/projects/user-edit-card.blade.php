@@ -31,25 +31,25 @@
             </form>
         @endif                       
         </div>
-                               <div class="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
-            <div class="flex items-center gap-4 text-xs">
-                            <div class="flex items-center gap-1.5">
+            <div class="mt-3 flex items-center justify-between border-t border-white/5 pt-3">
+                <div class="flex items-center gap-4 text-xs">
+                    <div class="flex items-center gap-1.5">
                     <i class="fa-solid fa-clock text-primary text-xs"></i>
-
-                                               <span class="text-sm font-semibold text-primary">{{ $userStats[$user->id]->entry_count ?? 0 }}</span>
+                    <span class="text-sm font-semibold text-primary">{{ $userStats[$user->id]->entry_count ?? 0 }}</span>
                 </div>
     <div class="flex items-center gap-1.5">
         <i class="fa-solid fa-hourglass-half text-primary text-xs"></i>
                     <span class="text-sm font-semibold text-primary"><x-minutes-to-hours minutes="{{ $userStats[$user->id]->total_minutes ?? 0 }}" /></span>
                 </div>
             </div>
-            
-            <x-forms.sm-button :href="route('users.show', $user)">View</x-forms.sm-button>
+            <div class="flex gap-3">
+                <x-forms.sm-button :href="route('users.show', $user)">View</x-forms.sm-button>
                 <form method="POST" action="{{ route('projects.users.destroy', [$project, $user]) }}">
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-forms.sm-button :secondary="true">Remove</x-forms.sm-button>
+                    @csrf
+                    @method('DELETE')
+                    <x-forms.sm-button :secondary="true">Kick</x-forms.sm-button>
                 </form>
+            </div>
         </div>
     </div>
 </div>

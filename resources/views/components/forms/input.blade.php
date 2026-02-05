@@ -3,7 +3,10 @@
     <input {{ $attributes->merge([
     'type' => 'text',
     'class' => 'input w-full text-textcol bg-slate-950/50 px-3 py-1
-    rounded-lg border border-textcol/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2
-    focus:ring-offset-darker transition-all duration-350 ease-in-out'
+    rounded-lg border border-textcol/10
+    hover:border-primary hover:bg-slate-950/70
+    focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-darker
+    transition-all duration-150 ease-out
+    focus:duration-350 focus:ease-in-out'
 ]) }}>
 </div>

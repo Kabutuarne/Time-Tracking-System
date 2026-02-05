@@ -127,7 +127,7 @@
 
                         <div class="space-y-4">
                             @forelse ($entries as $entry)
-                                <x-projects.entry-card :entry="$entry" />
+                                <x-projects.entry-card :entry="$entry" :project="$task->project" />
                             @empty
                                 <div class="rounded-xl bg-slate-950/40 p-8 text-center ring-1 ring-white/5">
                                     <i class="fa-solid fa-inbox text-4xl text-slate-600 mb-3"></i>

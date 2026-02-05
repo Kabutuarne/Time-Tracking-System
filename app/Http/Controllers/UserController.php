@@ -102,25 +102,50 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $user)
+    public function edit()
     {
-        //
+        return view('users.edit', [
+            'user' => Auth::user(),
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $user)
     {
-        //
-    }
+        abort_unless(Auth::user()->id == $user, 403);
 
+        $validated = $request->validate([
+            'username' => ['required','string','max:100', Rule::unique(User::class)->ignore($user)],
+            'first_name' => ['required','string','max:100'],
+            'last_name' => ['required','string','max:100'],
+        ]);
+
+        Auth::user()->update($validated);
+
+        // return view('users.show', Auth::user());
+        return redirect()->route('users.show', $user);
+    }
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+
+    public function destroy(Request $request, User $user)
     {
-        //
+        
+        // $request->validateWithBag('userDeletion', [
+        //     'password' => ['required', 'current_password'],
+        // ]);
+        abort_unless(Auth::user()->id == $user->id, 403);
+
+        Auth::logout();
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('projects.index');
     }
 
     // Project management functions
@@ -139,7 +164,7 @@ class UserController extends Controller
 
         $project->users()->attach($user->id, ['role' => 'member']);
 
-        return back()->with('success', 'User added successfully');
+        return back();
     }
 
     public function updateProjectRole(Request $request, Project $project, User $user) 
