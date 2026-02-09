@@ -16,7 +16,7 @@ class EntryPolicy
     {
         return $project->is_public
             || $user->id === $project->user_id
-            || $user->projects()->where('project_id', $project->id)->exists();
+            || $user->isInProject($project);
     }
 
     /**
@@ -30,19 +30,8 @@ class EntryPolicy
             return true;
         }
 
-        if (!$user) {
-            return false;
-        }
-
         return $user->id === $project->user_id
-            || $user->projects()->where('project_id', $project->id)->exists();
-    }
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user, Project $project): bool
-    {
-        return $user->atLeastRoleInProject($project, 'member');
+            || $user->isInProject($project);
     }
 
     /**
@@ -59,22 +48,14 @@ class EntryPolicy
      */
     public function delete(User $user, Entry $entry): bool
     {
-        return $entry->user_id === $user->id ||
-                $user->atLeastRoleInProject($entry->project(), 'manager');
+        return $entry->user_id === $user->id
+        || $user->atLeastRoleInProject($entry->project, 'manager');
     }
 
     /**
      * Determine whether the user can restore the model.
      */
     public function restore(User $user, Entry $entry): bool
-    {
-        return false;
-    }
-
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
-    public function forceDelete(User $user, Entry $entry): bool
     {
         return false;
     }

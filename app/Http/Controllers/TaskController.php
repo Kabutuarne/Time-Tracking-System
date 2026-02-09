@@ -49,7 +49,7 @@ class TaskController extends Controller
     public function archived(Project $project, Task $task)
     {
         // abort_unless($task->project_id === $project->id, 404);
-        $this->authorize('softDelete', $project);
+        $this->authorize('softDelete', $task);
         $task->status = 'archived';
         $task->save();
 
@@ -89,7 +89,7 @@ class TaskController extends Controller
      */
     public function edit(Project $project, Task $task)
     {
-        $this->authorize('create', $project);
+        $this->authorize('modifyTask', $task);
         // abort_unless($task->project_id === $project->id, 404);
         // eager load project
         $task->load(['project']);
@@ -115,8 +115,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Project $project, Task $task)
     {
-        // abort_unless($task->project_id === $project->id, 404);
-        $this->authorize('update', $project);
+        $this->authorize('modifyTask', $task);
 
         $validated = $request->validate([
             'title' => ['required','string','max:100'],
@@ -138,8 +137,7 @@ class TaskController extends Controller
      */
     public function destroy(Project $project, Task $task)
     {
-        $this->authorize('delete', $project);
-        // abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('delete', $task);
         $task->delete();
         return back();
     }

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Gate;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Entry;
@@ -10,7 +9,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
@@ -27,7 +26,7 @@ class ProjectController extends Controller
                 'tasks',
                 'entries',
             ])
-            ->where('is_public', '=', 'true')
+            ->where('is_public', '=', '1')
             ->latest()
             ->get();
 
@@ -40,8 +39,7 @@ class ProjectController extends Controller
      */
     public function create()
     {  
-        $this->authorize('create');
-        
+    $this->authorize('create', Project::class);
         return view('projects.create');
     }
 
@@ -51,7 +49,7 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         // validate inputs
-        $this->authorize('create');
+        $this->authorize('create',Auth::user());
 
         $validated = $request->validate([
             'title' => ['required|string','max:100'],
@@ -86,9 +84,9 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+
         // use of policy
         $this->authorize('view', $project);
-
         // preload users
         $project->load('user', 'users');
 

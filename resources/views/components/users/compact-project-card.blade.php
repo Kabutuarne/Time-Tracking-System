@@ -44,6 +44,7 @@
                 View
             </x-forms.sm-button>
             @if(!$owned)
+                @if(Auth::id() == $user->id)
                 <form method="POST" action="{{ route('projects.users.destroy', [$project, $user]) }}">
                     @csrf
                     @method('DELETE')
@@ -52,6 +53,7 @@
                         Leave
                     </x-forms.sm-button>
                 </form>
+                @endif
             @endif
         </div>
     </div>

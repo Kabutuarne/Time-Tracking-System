@@ -89,20 +89,16 @@
 
                 <div class="p-10 space-y-8">
                     {{-- Action buttons --}}
-                    {{-- @auth --}}
-                    {{-- @if (auth()->user()->is($project->user) || $project->users->contains(auth()->user())) --}}
                     <div class="flex flex-wrap gap-3">
-                        <x-forms.button :href="route('projects.tasks.create', $project)">
-                            <i class="fa-solid fa-tasks mr-2"></i>Add Task
-                        </x-forms.button>
-                        {{-- @if (auth()->user()->is($project->user) || auth()->user()->isManagerOf($project)) --}}
-                        <x-forms.button :secondary="true" :href="route('projects.edit', $project)">
-                            <i class="fa-solid fa-edit mr-2"></i>Edit Project
-                        </x-forms.button>
-                        {{-- @endif --}}
+                        @can('update', $project)
+                            <x-forms.button :href="route('projects.tasks.create', $project)">
+                                <i class="fa-solid fa-tasks mr-2"></i>Add Task
+                            </x-forms.button>
+                            <x-forms.button :secondary="true" :href="route('projects.edit', $project)">
+                                <i class="fa-solid fa-edit mr-2"></i>Edit Project
+                            </x-forms.button>
+                        @endcan
                     </div>
-                    {{-- @endif --}}
-                    {{-- @endauth --}}
 
                     {{-- Entries and tasks --}}
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -25,7 +25,7 @@ class EntryController extends Controller
     public function create(Project $project, Task $task)
     {
         // abort_unless($task->project_id === $project->id, 403); redundant code
-        $this->authorize('create', $project);
+        $this->authorize('createEntry', $task);
         return view('entries.create', [
         'project' => $project,    
         'task' => $task,
@@ -37,7 +37,7 @@ class EntryController extends Controller
      */
     public function store(Project $project, Task $task, Request $request)
     {
-         $this->authorize('create', $project);
+         $this->authorize('createEntry', $task);
         $validated = $request->validate([
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
@@ -74,7 +74,7 @@ class EntryController extends Controller
      */
     public function edit(Project $project, Task $task, Entry $entry)
     {
-         $this->authorize('update', $project);
+         $this->authorize('update', $entry);
         return view('entries.edit', compact( 'project','task','entry'));
     }
 
@@ -83,7 +83,7 @@ class EntryController extends Controller
      */
     public function update(Request $request, Project $project, Task $task, Entry $entry)
     {
-        $this->authorize('update', $project);
+        $this->authorize('update', $entry);
         $validated = $request->validate([
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
@@ -99,7 +99,7 @@ class EntryController extends Controller
      */
     public function destroy(Project $project, Task $task, Entry $entry)
     {
-        $this->authorize('delete', $project);
+        $this->authorize('delete', $entry);
         $entry->delete();
         return back();
     }

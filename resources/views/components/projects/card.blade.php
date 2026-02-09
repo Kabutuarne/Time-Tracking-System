@@ -24,7 +24,9 @@
                 <h4 class="text-sm font-semibold text-textcol">{{ $project->user->username }}</h4>
                 <p class="text-xs text-slate-400">{{ $project->user->first_name }} {{ $project->user->last_name }}</p>
             </div>
-            <x-projects.card-role :project="$project" />
+            {{-- @auth will add later meybe
+            <x-projects.card-role :role="dd(Auth::user()->projects->find($project->id)?->pivot->role)" />
+            @endauth --}}
         </div>
 
         <div class="mt-6 grid grid-cols-3 gap-3">
@@ -36,11 +38,10 @@
         <div class="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
             <div class="flex items-center gap-2">
                 <x-forms.sm-button :secondary="false" :href="route('projects.show', $project)">View</x-forms.sm-button>
-                @auth
-                    @if (auth()->user()->is($project->user))
-                        <x-forms.sm-button :secondary="true" href="">Edit</x-forms.sm-button>
-                    @endif
-                @endauth
+                @can('update', $project)
+                    <x-forms.sm-button :secondary="true" href="">Edit</x-forms.sm-button>
+                @endcan
+
             </div>
             <span class="text-xs text-slate-400">{{ $project->created_at->diffForHumans() }}</span>
         </div>

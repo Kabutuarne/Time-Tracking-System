@@ -58,9 +58,8 @@
         </div>
         
         <div class="mt-4 flex items-left gap-2 border-t border-white/5 pt-3">
-            {{-- Allows editing and deleting entries only for Managers, entry creators or project owners --}}
-             {{-- @if (auth()->user()->is($entry->user) || auth()->user()->isManagerOf($entry->project) || auth()->user()->is($entry->project->user)) --}}
-                  <x-forms.sm-button 
+                @can('update', $entry)
+                 <x-forms.sm-button 
                     href="{{ route('projects.tasks.entries.edit', [
                         'project' => $entry->project,
                         'task' => $entry->task,
@@ -69,13 +68,17 @@
                 >
                     Edit Entry
                 </x-forms.sm-button>
-
-                <x-forms.sm-button>
-                    Delete Entry
-                </x-forms.sm-button>
-              {{-- @endif   --}}
-            {{-- @endauth --}}
-            
+                @endcan
+                @can('delete', $entry)
+                <form method="POST"
+                            action="{{ route('projects.tasks.entries.destroy', [$project, $entry->task, $entry]) }}"
+                            class="absolute bottom-[7%] right-0"
+                    >
+                        @csrf
+                        @method('DELETE')
+                        <x-forms.trash-button></x-forms.trash-button>
+                    </form>
+                @endcan
         </div>
     </div>
 </div>

@@ -107,18 +107,19 @@
                             <i class="fas fa-arrow-left mr-2"></i>
                             Back to Project
                         </x-forms.button>
-
-                        {{-- <x-forms.button :href="route('projects.entries.create', [$task->project, $task])"> --}}
-                            <x-forms.button>
+                        @can('createEntry', $task)
+                            <x-forms.button href="{{ route('projects.tasks.entries.create', [$task->project, $task]) }}">
                                 <i class="fas fa-plus mr-2"></i>
                                 Add Entry
                             </x-forms.button>
-
+                        @endcan
+                        @can('modifyTask', $task)
                             <x-forms.button :secondary="true"
                                 href="{{ route('projects.tasks.edit', [$task->project, $task]) }}">
                                 <i class="fas fa-edit mr-2"></i>
                                 Edit Task
                             </x-forms.button>
+                        @endcan
                     </div>
 
                     {{-- Task Entries --}}
