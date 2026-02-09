@@ -17,30 +17,13 @@ class TaskController extends Controller
     public function index()
     {
         //
-    }
-    /**
-     * Mark the specified task as completed.
-     */
-    // Made it a method instead
-    // public function complete(Project $project, Task $task)
-    // {
-    //     abort_unless($task->project_id === $project->id, 404);
-    //     $user = Auth::id();
-
-    //     $task->completed_at = now();
-    //     $task->completed_by = $user;
-    //     $task->status = 'completed';
-    //     $task->save();
-
-    //     return redirect()->back()->with('success', 'Task marked as completed.');
-    // }
-
+    }         
     /**
      * Show the form for creating a new resource.
      */
     public function create(Project $project)
     {
-        //add to which project the task will be added
+        $this->authorize('create', $project);
         return view('tasks.create', compact('project'));
     }
 
@@ -49,7 +32,7 @@ class TaskController extends Controller
      */
     public function store(Request $request, Project $project)
     {
-        
+        $this->authorize('create', $project);
         // must authentificate user before allowing to create task | later
         $validated = $request->validate([
             'title' => ['required','string','max:100'],
@@ -65,8 +48,8 @@ class TaskController extends Controller
     }
     public function archived(Project $project, Task $task)
     {
-        abort_unless($task->project_id === $project->id, 404);
-
+        // abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('softDelete', $project);
         $task->status = 'archived';
         $task->save();
 
@@ -78,7 +61,8 @@ class TaskController extends Controller
      */
     public function show(Project $project, Task $task)
     {
-        abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('view', $project);
+        // abort_unless($task->project_id === $project->id, 404);
         // eager load project
         $task->load(['project']);
         // get task stats
@@ -105,7 +89,8 @@ class TaskController extends Controller
      */
     public function edit(Project $project, Task $task)
     {
-        abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('create', $project);
+        // abort_unless($task->project_id === $project->id, 404);
         // eager load project
         $task->load(['project']);
         // get task stats
@@ -130,7 +115,8 @@ class TaskController extends Controller
      */
     public function update(Request $request, Project $project, Task $task)
     {
-        abort_unless($task->project_id === $project->id, 404);
+        // abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('update', $project);
 
         $validated = $request->validate([
             'title' => ['required','string','max:100'],
@@ -152,7 +138,8 @@ class TaskController extends Controller
      */
     public function destroy(Project $project, Task $task)
     {
-        abort_unless($task->project_id === $project->id, 404);
+        $this->authorize('delete', $project);
+        // abort_unless($task->project_id === $project->id, 404);
         $task->delete();
         return back();
     }

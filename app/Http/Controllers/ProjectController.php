@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Carbon\Carbon;
+use Illuminate\Support\Facades\Gate;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Entry;
@@ -27,6 +27,7 @@ class ProjectController extends Controller
                 'tasks',
                 'entries',
             ])
+            ->where('is_public', '=', 'true')
             ->latest()
             ->get();
 
@@ -39,6 +40,8 @@ class ProjectController extends Controller
      */
     public function create()
     {  
+        $this->authorize('create');
+        
         return view('projects.create');
     }
 
@@ -48,6 +51,8 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         // validate inputs
+        $this->authorize('create');
+
         $validated = $request->validate([
             'title' => ['required|string','max:100'],
             'description' => ['nullable','string','max:255'],
@@ -81,6 +86,9 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
+        // use of policy
+        $this->authorize('view', $project);
+
         // preload users
         $project->load('user', 'users');
 
@@ -143,6 +151,7 @@ class ProjectController extends Controller
             )
             ->groupBy('status')
             ->get();
+            
         // Total time per task (for bar chart)
         $taskTimeStats = Task::query()
             ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
@@ -189,11 +198,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        // Authorization check
-        // if ($project->user_id !== auth()->id() && !$project->users()->wherePivot('role', 'manager')->where('user_id', auth()->id())->exists()) {
-        //     abort(403);
-        // }
-
+        $this->authorize('update', $project);
         // Get user stats
         $userStats = Entry::query()
             ->join('tasks', 'tasks.id', '=', 'entries.task_id')
@@ -216,6 +221,8 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        $this->authorize('update', $project);
+
         $data = $request->validate([
             'title' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:255'],
@@ -241,8 +248,8 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        $this->authorize('delete', $project);
         $project->delete();
-        // why does it not redirect??
         return redirect()->route('projects.index');
     }
 }

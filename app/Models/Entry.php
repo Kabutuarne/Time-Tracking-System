@@ -5,13 +5,15 @@ namespace App\Models;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Project;
+use App\Traits\HasProjectRoles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Notifications\Notifiable;
 
 class Entry extends Model
 {
     /** @use HasFactory<\Database\Factories\EntryFactory> */
-    use HasFactory;
+    use HasFactory, Notifiable;
     protected $fillable = [
         'task_id',
         'user_id',
