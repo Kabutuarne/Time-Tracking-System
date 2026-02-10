@@ -1,5 +1,6 @@
 import './bootstrap';
 import '@fortawesome/fontawesome-free/css/all.css';
+import Notification from './components/Notification.vue';
 
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
@@ -21,7 +22,7 @@ app.use(VueApexCharts);
 // Global components
 app.component('project-statistics', ProjectStatistics);
 app.component('weekly-worked-time', WeeklyWorkedTime);
-
+app.component('notification', Notification);
 // Mount
 app.mount('#app');
 

@@ -31,7 +31,17 @@
 
     <main class="container mx-auto px-4 py-8">
         {{ $slot }}
+        <div id="app">
+            {{-- notification flash data --}}
+            @if (session()->has('success') || session()->has('error') || session()->has('warning') || session()->has('info'))
+                <div id="flash-data" data-success="{{ session('success') }}" data-error="{{ session('error') }}"
+                    data-warning="{{ session('warning') }}" data-info="{{ session('info') }}"></div>
+            @endif
+
+            <notification></notification>
+        </div>
     </main>
+
 </body>
 
 </html>

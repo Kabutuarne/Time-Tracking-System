@@ -49,10 +49,10 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         // validate inputs
-        $this->authorize('create',Auth::user());
+        // $this->authorize('create');
 
         $validated = $request->validate([
-            'title' => ['required|string','max:100'],
+            'title' => ['required','string','max:100'],
             'description' => ['nullable','string','max:255'],
             'is_public' => ['required','boolean'],
             'users' => ['nullable','array'],
@@ -64,8 +64,7 @@ class ProjectController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'] ?? null,
             'is_public' => $validated['is_public'],
-            // 'user_id' => auth()->id, // owner
-            'user_id' => 1, // for testing purposes rn
+            'user_id' => Auth::user()->id,
         ]);
 
         // attach selected users (if any)
@@ -74,7 +73,7 @@ class ProjectController extends Controller
         }
 
         // redirect
-        return redirect()->route('projects.show', $project);
+        return redirect()->route('projects.show', $project)->with('success', 'horaay!');
     }
 
     /**
@@ -237,7 +236,7 @@ class ProjectController extends Controller
         $project->update($data);
 
         return redirect()
-            ->route('projects.show', $project);
+            ->route('projects.show', $project)->with('success', 'horaay!');
     }
 
 
