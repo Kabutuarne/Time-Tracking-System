@@ -9,41 +9,17 @@ use Illuminate\Auth\Access\Response;
 
 class TaskPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
-    // public function viewAny(User $user): bool
+    // public function modifyTask(User $user, Task $task): bool
     // {
-    //     return false;
+    //     return $user->atLeastRoleInProject($task->project, 'manager')
+    //     && ($task->project->status == 'active' || 'on-hold'); //can only add new tasks to active projects
     // }
-
-    /**
-     * Determine whether the user can view the model.
-     */
-    // public function view(?User $user, Project $project): bool
-    // {
-    //     if ($project->is_public) {
-    //         return true;
-    //     }
-
-
-    //     return $user->id === $project->user_id
-    //         || $user->isInProject($project);    
-    // }
-
-    /**
-     * Determine whether the user can create models.
-     */
-    public function modifyTask(User $user, Task $task): bool
-    {
-        return $user->atLeastRoleInProject($task->project, 'manager')
-        && $task->project->status == 'active'; //can only add new tasks to active projects
-    }
 
     public function createEntry(User $user, Task $task): bool
     {
         return $user->atLeastRoleInProject($task->project, 'member')
-        && $task->status == 'in_progress';
+        && $task->status == 'in_progress'
+        && $task->project->status == 'active';
     }
     /**
      * Determine whether the user can update the model.
@@ -51,9 +27,8 @@ class TaskPolicy
     public function update(User $user, Task $task): bool
     {
         return $user->atLeastRoleInProject($task->project, 'manager')
-        && $task->project->status == 'active';
+        && ($task->project->status == 'active' || 'on-hold');
     }
-
     
     /**
      * Determine if user can soft delete task (set to archived)
@@ -61,13 +36,14 @@ class TaskPolicy
     public function softDelete(User $user, Task $task): bool
     {
         return $user->atLeastRoleInProject($task->project, 'manager')
-        && $task->project->status == 'active';
+        && ($task->project->status == 'active' || 'on-hold');
     }
     /**
      * Determine whether the user can permanently delete the model.
      */
     public function delete(User $user, Task $task): bool
     {
-        return $user->id === $task->project->user_id; //can only owner
+        return $user->id === $task->project->user_id
+        && ($task->project->status == 'active' || 'on-hold'); //can only owner
     }
 }

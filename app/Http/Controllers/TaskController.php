@@ -89,7 +89,7 @@ class TaskController extends Controller
      */
     public function edit(Project $project, Task $task)
     {
-        $this->authorize('modifyTask', $task);
+        $this->authorize('update', $task);
         // abort_unless($task->project_id === $project->id, 404);
         // eager load project
         $task->load(['project']);
@@ -115,7 +115,7 @@ class TaskController extends Controller
      */
     public function update(Request $request, Project $project, Task $task)
     {
-        $this->authorize('modifyTask', $task);
+        $this->authorize('update', $task);
 
         $validated = $request->validate([
             'title' => ['required','string','max:100'],

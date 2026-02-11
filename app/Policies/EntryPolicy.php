@@ -26,11 +26,8 @@ class EntryPolicy
     {
         $project = $entry->project;
 
-        if ($project->is_public) {
-            return true;
-        }
-
-        return $user->id === $project->user_id
+        return $project->is_public
+            || $user->id === $project->user_id
             || $user->isInProject($project);
     }
 
@@ -40,7 +37,8 @@ class EntryPolicy
     public function update(User $user, Entry $entry): bool
     {
         // only the creator can update their entry
-        return $entry->user_id === $user->id;
+        return $entry->user_id === $user->id &&
+        $entry->project->status == 'active';
     }
 
     /**
@@ -48,8 +46,9 @@ class EntryPolicy
      */
     public function delete(User $user, Entry $entry): bool
     {
-        return $entry->user_id === $user->id
-        || $user->atLeastRoleInProject($entry->project, 'manager');
+        return ($entry->user_id === $user->id // the creator or project manager or owner
+        || $user->atLeastRoleInProject($entry->project, 'manager')) &&
+        $entry->project->status == 'active';
     }
 
     /**

@@ -113,7 +113,7 @@
                                 Add Entry
                             </x-forms.button>
                         @endcan
-                        @can('modifyTask', $task)
+                        @can('update', $task)
                             <x-forms.button :secondary="true"
                                 href="{{ route('projects.tasks.edit', [$task->project, $task]) }}">
                                 <i class="fas fa-edit mr-2"></i>

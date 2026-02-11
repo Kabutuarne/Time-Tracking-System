@@ -30,9 +30,10 @@ class ProjectPolicy
             return $project->is_public;
         else
             return
-                $project->is_public ||
+                ($project->status == 'active' || $project->status == 'on-hold') &&
+                ($project->is_public ||
                 $user->id === $project->user_id || // owner
-                $user->projects()->where('project_id', $project->id)->exists();
+                $user->projects()->where('project_id', $project->id)->exists());
     }
     
     /**
@@ -40,7 +41,8 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $user->atLeastRoleInProject($project, 'manager');
+        return $user->atLeastRoleInProject($project, 'manager') &&
+        ($project->status != 'archived' || 'finished');
     }
     
     /**
@@ -57,7 +59,7 @@ class ProjectPolicy
     {
         return $user->id === $project->user_id; // only owner
     }
-    public function hardDelete(User $user, Project $project): bool
+    public function delete(User $user, Project $project): bool
     {
         return $user->id === $project->user_id && $project->status == 'archived';
     }

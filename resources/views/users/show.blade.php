@@ -127,7 +127,7 @@
                         </div>
                     </div>
 
-                    <div x-show="tab === 'summary'" id="app" x-cloak>
+                    <div x-show="tab === 'summary'" x-cloak>
                         <weekly-worked-time :weekly-work='@json($weeklyWork)' />
                     </div>
 
