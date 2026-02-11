@@ -125,7 +125,7 @@ class UserController extends Controller
         Auth::user()->update($validated);
 
         // return view('users.show', Auth::user());
-        return redirect()->route('users.show', $user);
+        return redirect()->route('users.show', $user)->with('success', 'Profile succesfully updated!');
     }
     /**
      * Remove the specified resource from storage.
@@ -145,7 +145,7 @@ class UserController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')->with('success', 'Profile succesfully deleted!');
     }
 
     // Project management functions
@@ -164,7 +164,7 @@ class UserController extends Controller
 
         $project->users()->attach($user->id, ['role' => 'member']);
 
-        return back();
+        return back()->with('success', 'User succesfully attatched to project!');
     }
 
     public function updateProjectRole(Request $request, Project $project, User $user) 
@@ -178,12 +178,12 @@ class UserController extends Controller
             ['role' => $request->role]
         );
 
-        return back();
+        return back()->with('success', 'Role succesfully changed!');
     }
 
     public function detachFromProject(Project $project, User $user)
     {
         $project->users()->detach($user->id);
-        return back();
+        return back()->with('success', 'User succesfully removed from project!');
     }
 }

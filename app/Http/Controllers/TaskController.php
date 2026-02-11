@@ -44,7 +44,7 @@ class TaskController extends Controller
         $task->project_id = $project->id;
         $task->save();
 
-        return redirect()->route('projects.show', $task->project);
+        return redirect()->route('projects.show', $task->project)->with('success', 'Task succesfully created!');
     }
     public function archived(Project $project, Task $task)
     {
@@ -53,7 +53,7 @@ class TaskController extends Controller
         $task->status = 'archived';
         $task->save();
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Task succesfully archived!');;
     }
 
     /**
@@ -128,7 +128,7 @@ class TaskController extends Controller
 
         return redirect()
             ->route('projects.tasks.show', [$project, $task])
-            ->with('success', 'Task updated.');
+            ->with('success', 'Task succesfully created!');
     }
 
 
@@ -139,6 +139,6 @@ class TaskController extends Controller
     {
         $this->authorize('delete', $task);
         $task->delete();
-        return back();
+        return back()->with('success', 'Task succesfully deleted!');
     }
 }

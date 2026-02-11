@@ -53,9 +53,13 @@ class ProjectPolicy
     /**
      * Determine if user can delete project
      */
-    public function delete(User $user, Project $project): bool
+    public function softDelete(User $user, Project $project): bool
     {
         return $user->id === $project->user_id; // only owner
+    }
+    public function hardDelete(User $user, Project $project): bool
+    {
+        return $user->id === $project->user_id && $project->status == 'archived';
     }
 
     public function create(?User $user): bool //anyone logged in can create a project

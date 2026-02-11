@@ -29,17 +29,22 @@
 <body class="bg-dark">
     <x-nav />
 
-    <main class="container mx-auto px-4 py-8">
+    <main id="app" class="container mx-auto px-4 py-8">
         {{ $slot }}
-        <div id="app">
-            {{-- notification flash data --}}
-            @if (session()->has('success') || session()->has('error') || session()->has('warning') || session()->has('info'))
-                <div id="flash-data" data-success="{{ session('success') }}" data-error="{{ session('error') }}"
-                    data-warning="{{ session('warning') }}" data-info="{{ session('info') }}"></div>
-            @endif
+        {{-- notification flash data --}}
+        @php
+            $flashData = [];
+            if (session()->has('success'))
+                $flashData['success'] = session('success');
+            if (session()->has('error'))
+                $flashData['error'] = session('error');
+            if (session()->has('warning'))
+                $flashData['warning'] = session('warning');
+            if (session()->has('info'))
+                $flashData['info'] = session('info');
+        @endphp
 
-            <notification></notification>
-        </div>
+        <notification :flash-data='@json($flashData)'></notification>
     </main>
 
 </body>

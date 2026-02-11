@@ -73,7 +73,7 @@ class ProjectController extends Controller
         }
 
         // redirect
-        return redirect()->route('projects.show', $project)->with('success', 'horaay!');
+        return redirect()->route('projects.show', $project)->with('success', 'Project succesfully created!');
     }
 
     /**
@@ -236,7 +236,7 @@ class ProjectController extends Controller
         $project->update($data);
 
         return redirect()
-            ->route('projects.show', $project)->with('success', 'horaay!');
+            ->route('projects.show', $project)->with('success', 'Project updated successfully!');
     }
 
 
@@ -247,6 +247,13 @@ class ProjectController extends Controller
     {
         $this->authorize('delete', $project);
         $project->delete();
-        return redirect()->route('projects.index');
+        return redirect()->route('projects.index')->with('success', 'Project succesfully deleted!');
+    }
+    public function archive(Project $project)
+    {
+        $this->authorize('delete', $project);
+        $project->status = 'archived';
+        $project->save();
+        return redirect()->route('projects.index')->with('success', 'Project succesfully archived!');
     }
 }

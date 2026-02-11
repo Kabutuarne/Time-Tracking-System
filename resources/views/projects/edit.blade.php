@@ -63,9 +63,10 @@
                         <div class="w-full max-w-md">
                             <div>
                                 <label class="block text-sm font-medium text-textcol">Add New Members</label>
-                                <div id="user-search"
-                                    data-selected-users='@json(old("users") ?? ($project->users->pluck("id") ?? []))'>
-                                </div>
+                                <user-search
+                                    :initial-users='@json(old("users") ?? ($project->users->pluck("id") ?? []))'
+                                ></user-search>
+
                             </div>
                         </div>
                     </form>

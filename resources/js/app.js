@@ -23,12 +23,13 @@ app.use(VueApexCharts);
 app.component('project-statistics', ProjectStatistics);
 app.component('weekly-worked-time', WeeklyWorkedTime);
 app.component('notification', Notification);
+app.component('user-search', UserSearch);
 // Mount
 app.mount('#app');
 
-const userSearchEl = document.getElementById('user-search');
+// const userSearchEl = document.getElementById('user-search');
 
-if (userSearchEl) {
-    const userSearchApp = createApp(UserSearch);
-    userSearchApp.mount(userSearchEl);
-}
+// if (userSearchEl) {
+//     const userSearchApp = createApp(UserSearch);
+//     userSearchApp.mount(userSearchEl);
+// }

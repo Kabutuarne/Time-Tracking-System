@@ -91,7 +91,7 @@ class EntryController extends Controller
         ]);
         $entry->update($validated);
         return redirect()
-            ->route('projects.show', $project);
+            ->route('projects.show', $project)->with('success', 'Entry succesfully created!');
     }
 
     /**
@@ -101,7 +101,7 @@ class EntryController extends Controller
     {
         $this->authorize('delete', $entry);
         $entry->delete();
-        return back();
+        return back()->with('success', 'Entry succesfully deleted!');
     }
 
 }

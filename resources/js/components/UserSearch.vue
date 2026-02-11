@@ -1,17 +1,23 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import axios from 'axios'
 
-const el = document.getElementById('user-search')
-if (!el) throw new Error('UserSearch mount element not found')
+const props = defineProps({
+  initialUsers: {
+    type: Array,
+    default: () => [],
+  },
+})
 
-//only track newly added users
 const selectedUsers = ref([])
-
 const query = ref('')
 const results = ref([])
 const loading = ref(false)
 const showResults = ref(false)
+
+onMounted(() => {
+  selectedUsers.value = props.initialUsers.map(id => ({ id }))
+})
 
 watch(query, async (q) => {
   if (q.length < 2) {
@@ -20,9 +26,12 @@ watch(query, async (q) => {
   }
 
   loading.value = true
-  const { data } = await axios.get(`/users/search`, { params: { q } })
-  // exclude already selected users
-  results.value = data.filter(u => !selectedUsers.value.some(su => su.id === u.id))
+  const { data } = await axios.get('/users/search', { params: { q } })
+
+  results.value = data.filter(
+    u => !selectedUsers.value.some(su => su.id === u.id)
+  )
+
   loading.value = false
 })
 
@@ -32,6 +41,7 @@ function toggleUser(user) {
   }
 }
 </script>
+
 
 <template>
   <div class="relative space-y-2">
