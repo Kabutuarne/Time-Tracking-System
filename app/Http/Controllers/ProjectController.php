@@ -195,7 +195,7 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
-        $this->authorize('update', $project);
+        $this->authorize('viewUpdate', $project);
         // Get user stats
         $userStats = Entry::query()
             ->join('tasks', 'tasks.id', '=', 'entries.task_id')
@@ -251,9 +251,16 @@ class ProjectController extends Controller
     }
     public function archive(Project $project)
     {
-        $this->authorize('delete', $project);
+        $this->authorize('softDelete', $project);
         $project->status = 'archived';
         $project->save();
-        return redirect()->route('projects.index')->with('success', 'Project succesfully archived!');
+        return redirect()->back()->with('success', 'Project succesfully archived!');
+    }
+    public function restore(Project $project)
+    {
+        $this->authorize('restore', $project);
+        $project->status = 'active';
+        $project->save();
+        return redirect()->back()->with('success', 'Project succesfully restored!');
     }
 }

@@ -9,14 +9,16 @@ const props = defineProps({
   },
 })
 
-const selectedUsers = ref([])
+const allSelectedUsers = ref([]) // All users, including initial
+const newSelectedUsers = ref([]) // Only newly added users
 const query = ref('')
 const results = ref([])
 const loading = ref(false)
 const showResults = ref(false)
 
 onMounted(() => {
-  selectedUsers.value = props.initialUsers.map(id => ({ id }))
+
+  allSelectedUsers.value = props.initialUsers.map(id => ({ id }))
 })
 
 watch(query, async (q) => {
@@ -28,20 +30,28 @@ watch(query, async (q) => {
   loading.value = true
   const { data } = await axios.get('/users/search', { params: { q } })
 
+  // Filter out any already selected (existing or new)
   results.value = data.filter(
-    u => !selectedUsers.value.some(su => su.id === u.id)
+    u => !allSelectedUsers.value.some(su => su.id === u.id)
   )
 
   loading.value = false
 })
 
 function toggleUser(user) {
-  if (!selectedUsers.value.some(u => u.id === user.id)) {
-    selectedUsers.value.push(user)
+  // Add user to both allSelectedUsers and newSelectedUsers
+  if (!allSelectedUsers.value.some(u => u.id === user.id)) {
+    allSelectedUsers.value.push(user)
+    newSelectedUsers.value.push(user)
   }
 }
-</script>
 
+// Optional: remove a newly added user
+function removeNewUser(userId) {
+  newSelectedUsers.value = newSelectedUsers.value.filter(u => u.id !== userId)
+  allSelectedUsers.value = allSelectedUsers.value.filter(u => u.id !== userId)
+}
+</script>
 
 <template>
   <div class="relative space-y-2">
@@ -77,27 +87,17 @@ function toggleUser(user) {
       </button>
     </div>
 
-    <!-- the new selected users -->
+    <!-- only show newly selected users -->
     <div class="space-y-2 mt-2">
-      <div v-if="selectedUsers.length === 0" class="text-xs text-textcol2">No users selected</div>
+      <div v-if="newSelectedUsers.length === 0" class="text-xs text-textcol2">No users selected</div>
 
-      <div v-for="user in selectedUsers" :key="user.id"
+      <div v-for="user in newSelectedUsers" :key="user.id"
            class="flex items-center justify-between bg-slate-950/50 h-[40px] px-3 rounded-lg text-textcol">
         <span>{{ user.username }}</span>
         <button type="button"
-                @click="selectedUsers = selectedUsers.filter(u => u.id !== user.id)"
+                @click="removeNewUser(user.id)"
                 class="relatives text-xs scale-50% p-0 m-0 border-none bg-transparent cursor-pointer text-base transition-transform duration-200 ease-in-out group/trash scale-[0.45]">
-                <svg class="w-16 h-16 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-md overflow-visible group-hover/trash:scale-[1.08] group-hover/trash:rotate-[3deg] group-active:scale-[0.96] group-active:rotate-[-1deg]"
-                    viewBox="0 -10 64 74" xmlns="http://www.w3.org/2000/svg">
-                    <g id="trash-can">
-                        <rect x="16" y="24" width="32" height="30" rx="3" ry="3" fill="#01BAEF"></rect>
-                        <g transform-origin="12 18" id="lid-group"
-                            class="transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/trash:rotate-[-28deg] group-hover/trash:translate-y-[2px] group-active/trash:rotate-[-12deg] group-active:scale-[0.98]">
-                            <rect x="12" y="12" width="40" height="6" rx="2" ry="2" fill="#01BAEF"></rect>
-                            <rect x="26" y="8" width="12" height="4" rx="2" ry="2" fill="#01BAEF"></rect>
-                        </g>
-                    </g>
-                </svg>    
+          <!-- svg trash icon here -->
         </button>
         <input type="hidden" name="users[]" :value="user.id">
       </div>

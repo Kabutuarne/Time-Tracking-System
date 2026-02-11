@@ -9,9 +9,24 @@
                 <h1 class="text-4xl font-bold text-textcol">
                     Edit Project
                 </h1>
+                @can('update', $project)
                 <p class="mt-2 text-textcol2">
                     Change project details and manage members.
                 </p>
+                @else
+                <p class="mt-2 text-textcol">
+                    You cannot update project details or members, if the project is marked as 
+                    <span class="inline-flex items-center gap-1 rounded-full bg-green-500/10 px-2 py-0.5">
+                        <span class="text-xs text-green-400">Finished</span>
+                    </span>
+                    
+                    or
+                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-500/10 px-2 py-0.5">
+                        <span class="text-xs text-gray-400">Archived</span>
+                    </span>
+                    
+                </p>
+                @endcan
             </div>
 
             <div class="p-10 space-y-10">
@@ -22,6 +37,7 @@
                         class="grid grid-cols-2 gap-8">
                         @csrf
                         @method('PUT')
+                       @can('update', $project) 
                         <div class="space-y-6">
                             <div>
                                 <label class="block text-sm font-medium text-textcol">Title</label>
@@ -49,7 +65,6 @@
                                         :options="['active' => 'Active', 'on-hold' => 'On Hold', 'finished' => 'Finished']" />
                                 </div>
                             </div>
-
                             <div class="flex justify-between">
                                 <x-forms.button>
                                     <i class="fa-solid fa-save mr-2"></i>Save Changes
@@ -59,7 +74,39 @@
                                     <i class="fa-solid fa-cancel mr-2"></i>Cancel
                                 </x-forms.button>
                             </div>
+                        @else
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Title (readonly)</label>
+                                <x-forms.input readonly class="w-[100%] text-textcol2" type="text" name="title"
+                                    value="{{ old('title', $project->title) }}" required />
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Description (readonly)</label>
+                                <x-forms.textarea readonly class="w-[100%] text-textcol2" name="description" rows="4">
+                                    {{ old('description', $project->description) }}
+                                </x-forms.textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-textcol">Status {{ $project->status }}</label>
+                            </div>
+                        @endcan
+                    
+                        @can('restore', $project)
+                        <div class="flex justify-between">
+                            {{-- make it a danger button later | tell the user it will make project 'active' --}}
+                            <x-forms.button href="{{ route('projects.restore', $project) }}">
+                                <i class="fa-solid fa-recycle mr-2 text-green-300"></i>
+                                <span class="text-green-300 font-bold">Restore Project</span>
+                            </x-forms.button>
+                            <x-forms.button :secondary="true" href="{{ route('projects.show', $project) }}">
+                                <i class="fas fa-arrow-left mr-2"></i>Return
+                            </x-forms.button>
                         </div>
+                        @endcan
+                        </div>
+                        @can('update', $project)
                         <div class="w-full max-w-md">
                             <div>
                                 <label class="block text-sm font-medium text-textcol">Add New Members</label>
@@ -69,6 +116,7 @@
 
                             </div>
                         </div>
+                        @endcan
                     </form>
 
 
@@ -93,16 +141,27 @@
                         @endforeach
                     </div>
 
-                    {{-- Delete project --}}
-                    <div class="mt-8">
+                    {{-- Delete project  (ONLY if it is ARCHIVED, otherwise nuh uh)--}}
+                    @can('delete', $project)
+                      <div class="mt-8">
                         <form method="POST" action="{{ route('projects.destroy', $project) }}">
                             @method('DELETE')
-                            <x-forms.button>
+                            {{-- make it a danger button later --}}
+                            <x-forms.button> 
                                 <i class="fa-solid fa-trash mr-2 text-red-300"></i>
                                 <span class="text-red-300 font-bold">Delete Project</span>
                             </x-forms.button>
                         </form>
-                    </div>
+                    </div>  
+                    @elsecan('softDelete', $project)
+                        <div class="mt-8">
+                            {{-- make it a danger button later --}}
+                            <x-forms.button href="{{ route('projects.archive', $project) }}">
+                                <i class="fa-solid fa-trash mr-2 text-red-300"></i>
+                                <span class="text-red-300 font-bold">Archive Project</span>
+                            </x-forms.button>
+                        </div>
+                    @endcan
                 </div>
             </div>
         </div>

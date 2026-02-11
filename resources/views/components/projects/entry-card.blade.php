@@ -76,7 +76,11 @@
                     >
                         @csrf
                         @method('DELETE')
-                        <x-forms.trash-button></x-forms.trash-button>
+                        <x-forms.trash-button
+                            confirm="true"
+                            confirm-title="Warning!"
+                            confirm-message="This action will remove the entry forever, and time spent on the task will be forgotten!"
+                        />
                     </form>
                 @endcan
         </div>

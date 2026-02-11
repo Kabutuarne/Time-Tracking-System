@@ -12,7 +12,7 @@
 
 <div
     x-data="{ label: '{{ ucfirst($selectedLabel) }}' }"
-    class="relative text-textcol inline-block group/dropdown {{ $width }}"
+    class="relative text-textcol2 inline-block group/dropdown {{ $width }}"
 >
     {{-- Selected --}}
     <div

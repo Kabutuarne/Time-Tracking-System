@@ -1,8 +1,8 @@
 <x-layout>
     <x-slot:title>{{ $user->username }}</x-slot:title>
 
-    <div class="relative min-h-screen w-full bg-darker overflow-hidden">
-        {{-- ambient blobs, because aesthetics --}}
+    <div id="app" class="relative min-h-screen w-full bg-darker overflow-hidden">
+
         <div
             class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/0 blur-3xl">
         </div>
@@ -29,10 +29,9 @@
                     </div>
                 </div>
 
-                {{-- Tabs --}}
-                <div x-data="{ tab: 'info' }" class="p-10 space-y-8">
+                <div class="p-10 space-y-8">
 
-                    {{-- Tab buttons --}}
+                    {{-- Tab Buttons --}}
                     <div class="flex gap-3 border-b border-white/5 pb-4">
                         <button @click="tab = 'info'"
                             :class="tab === 'info' ? 'text-primary border-primary' : 'text-textcol2 border-transparent'"
@@ -54,29 +53,33 @@
                     </div>
 
                     {{-- USER INFO --}}
-                    <div x-show="tab === 'info'" x-cloak class="space-y-6">
+                    <div v-show="tab === 'info'" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                             <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
                                 <h3 class="text-lg font-semibold text-textcol mb-4">Account</h3>
                                 <ul class="space-y-2 text-textcol2">
                                     <li><strong class="text-textcol">Full name </strong> {{ $user->first_name }}
-                                        {{ $user->last_name }}
-                                    </li>
+                                        {{ $user->last_name }}</li>
                                     <li><strong class="text-textcol">Email </strong> {{ $user->email }}</li>
                                     <li><strong class="text-textcol">Joined </strong>
                                         {{ $user->created_at->toFormattedDateString() }}</li>
                                 </ul>
                             </div>
+
                             @if(Auth::id() == $user->id)
                                 <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
                                     <h3 class="text-lg font-semibold text-textcol mb-4">Actions</h3>
                                     <div class="grid grid-cols-1 gap-3">
+
                                         <x-forms.button href="{{ route('users.edit', $user) }}">
                                             <i class="fas fa-edit mr-2"></i> Edit Profile
                                         </x-forms.button>
+
                                         <x-forms.button href="#">
                                             <i class="fas fa-key mr-2"></i> Change Password
                                         </x-forms.button>
+
                                         <form method="POST" action="{{ route('users.destroy', $user) }}">
                                             @csrf
                                             @method('DELETE')
@@ -94,11 +97,10 @@
                     </div>
 
                     {{-- PROJECTS --}}
-                    <div x-show="tab === 'projects'" x-cloak class="space-y-8">
+                    <div v-show="tab === 'projects'" class="space-y-8">
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                            {{-- Owned projects --}}
                             <div class="space-y-4">
                                 <h2 class="text-2xl font-bold text-textcol">Owned Projects</h2>
 
@@ -111,9 +113,8 @@
                                 @endforelse
                             </div>
 
-                            {{-- Member of projects --}}
                             <div class="space-y-4">
-                                <h2 class="text-2xl font-bold text-textcol">Part of Projects </h2>
+                                <h2 class="text-2xl font-bold text-textcol">Part of Projects</h2>
 
                                 @forelse ($memberProjects as $project)
                                     <x-users.compact-project-card :project="$project" :user="$user" />
@@ -127,7 +128,8 @@
                         </div>
                     </div>
 
-                    <div x-show="tab === 'summary'" x-cloak>
+                    {{-- STATISTICS --}}
+                    <div v-show="tab === 'summary'">
                         <weekly-worked-time :weekly-work='@json($weeklyWork)' />
                     </div>
 

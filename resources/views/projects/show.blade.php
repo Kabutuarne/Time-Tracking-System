@@ -90,7 +90,7 @@
                 <div class="p-10 space-y-8">
                     {{-- Action buttons --}}
                     <div class="flex flex-wrap gap-3">
-                        @can('update', $project)
+                        @can('viewUpdate', $project)
                             <x-forms.button :href="route('projects.tasks.create', $project)">
                                 <i class="fa-solid fa-tasks mr-2"></i>Add Task
                             </x-forms.button>

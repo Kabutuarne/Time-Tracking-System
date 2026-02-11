@@ -61,7 +61,11 @@
                     class="absolute bottom-[-7%] left-[15%]">
                     @csrf
                     @method('DELETE')
-                    <x-forms.trash-button></x-forms.trash-button>
+                    <x-forms.trash-button
+                            confirm="true"
+                            confirm-title="Warning!"
+                            confirm-message="This action will remove the task forever, and all entries for it will be forgotten!"
+                        />
                 </form>
             @endcan
 

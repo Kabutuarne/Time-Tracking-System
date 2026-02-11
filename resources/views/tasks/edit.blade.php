@@ -113,6 +113,7 @@
                             </x-forms.button>
 
                             <x-forms.button :secondary="true" href="{{ route('projects.show', $task->project) }}">
+                                <i class="fas fa-cancel"></i>
                                 Cancel
                             </x-forms.button>
                         </div>
@@ -132,7 +133,11 @@
                                 >
                                     @csrf
                                     @method('DELETE')
-                                    <x-forms.trash-button></x-forms.trash-button>
+                                    <x-forms.trash-button
+                                        confirm="true"
+                                        confirm-title="Warning!"
+                                        confirm-message="This action will delete the entry forever, and the time spent on it will be forgotten!"
+                                    />
                                 </form>
                             </div>
                         @empty

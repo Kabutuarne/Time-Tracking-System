@@ -45,6 +45,8 @@
         @endphp
 
         <notification :flash-data='@json($flashData)'></notification>
+        <confirmation-modal :visible="confirm.visible" :title="confirm.title" :message="confirm.message"
+            @update:visible="confirm.visible = $event" @confirmed="confirm.action && confirm.action()" />
     </main>
 
 </body>

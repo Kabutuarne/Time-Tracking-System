@@ -52,8 +52,15 @@ Route::scopeBindings()->group(function () {
     // Task management
     Route::get('projects/{project}/tasks/{task}/complete', [TaskController::class, 'complete'])
         ->name('projects.tasks.complete');
+
     Route::get('projects/{project}/tasks/{task}/archived', [TaskController::class, 'archived'])
         ->name('projects.tasks.archived');
+
+    // Project Management
+    Route::get('projects/{project}/archive', [ProjectController::class, 'archive'])
+        ->name('projects.archive');
+    Route::get('projects/{project}/restore', [ProjectController::class, 'restore'])
+        ->name('projects.restore');
 
     // User search route
     Route::get('/users/search', function () {

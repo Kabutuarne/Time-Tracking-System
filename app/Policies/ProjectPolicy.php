@@ -25,15 +25,17 @@ class ProjectPolicy
     public function view(?User $user, Project $project): bool
     {
         // Project is public OR user is member/manager/owner
-        // dd($user);
+        // dd($user)
         if($user == null)
             return $project->is_public;
         else
-            return
-                ($project->status == 'active' || $project->status == 'on-hold') &&
-                ($project->is_public ||
-                $user->id === $project->user_id || // owner
-                $user->projects()->where('project_id', $project->id)->exists());
+            if($project->status === 'archived')
+                return $user->atLeastRoleInProject($project, 'owner');
+            else
+                return
+                    $project->is_public ||
+                    $user->id === $project->user_id || // owner
+                    $user->isInProject($project);
     }
     
     /**
@@ -42,9 +44,15 @@ class ProjectPolicy
     public function update(User $user, Project $project): bool
     {
         return $user->atLeastRoleInProject($project, 'manager') &&
-        ($project->status != 'archived' || 'finished');
+        in_array($project->status, ['active', 'on-hold'], true);
     }
-    
+    public function viewUpdate(User $user, Project $project): bool
+    {
+        if($project->status === 'archived')
+            return $user->id === $project->user_id;
+        else
+            return $user->atLeastRoleInProject($project, 'manager');
+    }
     /**
      * Determine if user can manage project members
      */
@@ -57,11 +65,15 @@ class ProjectPolicy
      */
     public function softDelete(User $user, Project $project): bool
     {
-        return $user->id === $project->user_id; // only owner
+        return $user->id === $project->user_id && $project->status != 'archived'; // only owner
     }
     public function delete(User $user, Project $project): bool
     {
-        return $user->id === $project->user_id && $project->status == 'archived';
+        return $user->id === $project->user_id && $project->status === 'archived';
+    }
+    public function restore(User $user, Project $project): bool
+    {
+        return $user->id === $project->user_id && in_array($project->status, ['archived', 'finished'], true);;
     }
 
     public function create(?User $user): bool //anyone logged in can create a project

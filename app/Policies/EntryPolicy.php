@@ -38,7 +38,7 @@ class EntryPolicy
     {
         // only the creator can update their entry
         return $entry->user_id === $user->id &&
-        $entry->project->status == 'active';
+        $entry->project->status === 'active';
     }
 
     /**
@@ -48,7 +48,7 @@ class EntryPolicy
     {
         return ($entry->user_id === $user->id // the creator or project manager or owner
         || $user->atLeastRoleInProject($entry->project, 'manager')) &&
-        $entry->project->status == 'active';
+        $entry->project->status === 'active';
     }
 
     /**

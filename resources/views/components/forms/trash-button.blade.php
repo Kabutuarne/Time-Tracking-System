@@ -1,5 +1,26 @@
-<button aria-label="Delete item" type="submit"
-    class="relatives scale-50% p-2 border-none bg-transparent cursor-pointer text-base transition-transform duration-200 ease-in-out group/trash scale-[0.6]">
+@props([
+    'confirm' => false,
+    'confirmTitle' => 'Are you sure?',
+    'confirmMessage' => 'This action cannot be undone.',
+])
+
+<button 
+    type="button"
+    @click.prevent="
+        const form = $event.currentTarget.closest('form');
+        if(@js($confirm)) {
+            $root.showConfirm(
+                '{{ $confirmTitle }}',
+                '{{ $confirmMessage }}',
+                () => form.submit()
+            )
+        } else {
+            form?.submit();
+        }
+    "
+
+    class="relatives scale-50% p-2 border-none bg-transparent cursor-pointer text-base transition-transform duration-200 ease-in-out group/trash scale-[0.6]"
+>
     <svg class="w-16 h-16 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-md overflow-visible group-hover/trash:scale-[1.08] group-hover/trash:rotate-[3deg] group-active:scale-[0.96] group-active:rotate-[-1deg]"
         viewBox="0 -10 64 74" xmlns="http://www.w3.org/2000/svg">
         <g id="trash-can">
