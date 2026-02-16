@@ -11,23 +11,63 @@
             <a 
                 {{ $attributes->merge(['class' => "relative inline-block p-px font-semibold leading-6 text-textcol " . ($secondary ? "bg-accent" : " bg-dark") . " shadow-2xl cursor-pointer rounded-xl shadow-zinc-900 transition-transform duration-300 ease-in-out group-hover/buttonbig:scale-105 active:scale-95"]) }}
                 @if($confirm)
-                    @click.prevent="
-                        const form = $event.currentTarget.closest('form');
-                        $root.showConfirm('{{ $confirmTitle }}', '{{ $confirmMessage }}', () => {
-                            if(form) form.submit();
-                            else window.location = $event.currentTarget.href;
-                        })
-                    "
+                    onclick="(function(el, needsConfirm) {
+                        if (needsConfirm) {
+                            event.preventDefault();
+                            const form = el.closest('form');
+                            const href = el.href;
+                            setTimeout(() => {
+                                if (window.vueAppInstance && typeof window.vueAppInstance.showConfirm === 'function') {
+                                    window.vueAppInstance.showConfirm(
+                                        '{{ addslashes($confirmTitle) }}',
+                                        '{{ addslashes($confirmMessage) }}',
+                                        () => {
+                                            if(form) {
+                                                form.submit();
+                                            } else {
+                                                window.location = href;
+                                            }
+                                        }
+                                    );
+                                } else {
+                                    console.error('Vue app instance not available');
+                                    if (confirm('{{ addslashes($confirmTitle) }}\n\n{{ addslashes($confirmMessage) }}')) {
+                                        if(form) {
+                                            form.submit();
+                                        } else {
+                                            window.location = href;
+                                        }
+                                    }
+                                }
+                            }, 10);
+                        }
+                    })(this, {{ $confirm ? 'true' : 'false' }}); return false;"
                 @endif
             >
         @else
             <button 
                 {{ $attributes->merge(['type' => 'submit', 'class' => "relative inline-block p-px font-semibold leading-6 text-textcol " . ($secondary ? "bg-accent" : "bg-dark") . " shadow-2xl cursor-pointer rounded-xl shadow-zinc-900 transition-transform duration-300 ease-in-out group-hover/buttonbig:scale-105 active:scale-95"]) }}
                 @if($confirm)
-                    @click.prevent="
-                        const form = $event.currentTarget.closest('form');
-                        $root.showConfirm('{{ $confirmTitle }}', '{{ $confirmMessage }}', () => form?.submit())
-                    "
+                    onclick="(function(btn, needsConfirm) {
+                        if (needsConfirm) {
+                            event.preventDefault();
+                            const form = btn.closest('form');
+                            setTimeout(() => {
+                                if (window.vueAppInstance && typeof window.vueAppInstance.showConfirm === 'function') {
+                                    window.vueAppInstance.showConfirm(
+                                        '{{ addslashes($confirmTitle) }}',
+                                        '{{ addslashes($confirmMessage) }}',
+                                        () => form?.submit()
+                                    );
+                                } else {
+                                    console.error('Vue app instance not available');
+                                    if (confirm('{{ addslashes($confirmTitle) }}\n\n{{ addslashes($confirmMessage) }}')) {
+                                        form?.submit();
+                                    }
+                                }
+                            }, 10);
+                        }
+                    })(this, {{ $confirm ? 'true' : 'false' }}); return false;"
                 @endif
             >
         @endif

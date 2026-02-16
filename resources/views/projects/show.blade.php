@@ -105,53 +105,34 @@
                         {{-- Project Entries --}}
                         <div class="lg:col-span-2 space-y-4">
                             <h2 class="text-2xl font-bold text-textcol">Project Entries</h2>
-                            <div class="space-y-4">
-                                @forelse ($entries ?? [] as $entry)
-                                    <x-projects.entry-card :entry="$entry" :project="$project" />
-                                @empty
-                                    <div class="rounded-xl bg-slate-950/40 p-8 text-center ring-1 ring-white/5">
-                                        <i class="fa-solid fa-inbox text-4xl text-slate-600 mb-3"></i>
-                                        <p class="text-slate-400">No entries yet.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                            {{ $entries->links() }}
+                            @livewire('project-entries', ['project' => $project])
                         </div>
-
                         {{-- Project tasks --}}
                         <div class="space-y-4">
                             <h2 class="text-2xl font-bold text-textcol">Tasks</h2>
-                            <div class="space-y-3">
-                                @forelse ($tasks ?? [] as $task)
-                                    <x-projects.task-card :project="$project" :task="$task" />
-                                @empty
-                                    <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
-                                        <i class="fa-solid fa-tasks text-3xl text-slate-600 mb-2"></i>
-                                        <p class="text-slate-400 text-sm">No tasks yet.</p>
-                                    </div>
-                                @endforelse
-                            </div>
-                            {{ $tasks->links() }}
+                            @livewire('project-tasks', ['project' => $project])
                         </div>
+
                     </div>
+
                     {{-- Statistics --}}
-                    <div id="app" class="mt-8">
-                        <h2 class="text-2xl font-bold text-textcol mb-4">Statistics</h2>
+                    <div>
+                        <div id="app" class="mt-8">
+                            <h2 class="text-2xl font-bold text-textcol mb-4">Statistics</h2>
 
-                        <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
-                            @if ($tasks->count() !== 0)
-                                <project-statistics :weekly-user-stats='@json($weeklyUserStats)'
-                                    :task-status-stats='@json($taskStatusStats)' :task-time-stats='@json($taskTimeStats)' />
-                            @else
-                                <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
-                                    <i class="fas fa-chart-bar text-3xl text-slate-600 mb-2"></i>
-                                    <p class="text-slate-400 text-sm">No data yet.</p>
-                                </div>
-                            @endif
+                            <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
+                                @if ($tasks->count() !== 0)
+                                    <project-statistics :project-id="{{ $project->id }}" />
+                                @else
+                                    <div class="rounded-xl bg-slate-950/40 p-6 text-center ring-1 ring-white/5">
+                                        <i class="fas fa-chart-bar text-3xl text-slate-600 mb-2"></i>
+                                        <p class="text-slate-400 text-sm">No data yet.</p>
+                                    </div>
+                                @endif
 
+                            </div>
                         </div>
                     </div>
-
 
                     {{-- Team members --}}
                     <div class="mt-8">

@@ -24,14 +24,18 @@
             }
         }
     </script>
+    @livewireStyles
 </head>
 
 <body class="bg-dark">
-    <x-nav />
+    <div id="app">
+        <x-nav />
 
-    <main id="app" class="container mx-auto px-4 py-8">
-        {{ $slot }}
-        {{-- notification flash data --}}
+        <main class="container mx-auto px-4 py-8">
+            {{ $slot }}
+        </main>
+
+        {{-- Vue Components - Notification and Confirmation Modal --}}
         @php
             $flashData = [];
             if (session()->has('success'))
@@ -45,10 +49,13 @@
         @endphp
 
         <notification :flash-data='@json($flashData)'></notification>
-        <confirmation-modal :visible="confirm.visible" :title="confirm.title" :message="confirm.message"
-            @update:visible="confirm.visible = $event" @confirmed="confirm.action && confirm.action()" />
-    </main>
 
+        {{-- FIXED: Use the new flat property names instead of nested confirm object --}}
+        <confirmation-modal :visible="confirmModalVisible" :title="confirmModalTitle" :message="confirmModalMessage"
+            @update:visible="confirmModalVisible = $event" @confirmed="handleConfirm" />
+    </div>
+
+    @livewireScripts
 </body>
 
 </html>

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\User;
+use App\Http\Controllers\Controller;
 use App\Models\Entry;
 use App\Models\Project;
+use App\Models\Task;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
 {
@@ -165,14 +166,14 @@ class ProjectController extends Controller
         // entry pagination
         $entries = $project->entries()
             ->latest()
-            ->with(['user', 'task', 'project'])
-            ->paginate(5, ['*'], 'entries_page');
+            ->with(['user', 'task', 'project']);
+            // ->paginate(5, ['*'], 'entries_page');
 
         // task pagination
         $tasks = $project->tasks()
             ->latest()
-            ->with('project')
-            ->paginate(5, ['*'], 'tasks_page');
+            ->with('project');
+            // ->paginate(5, ['*'], 'tasks_page');
 
         return view(
             'projects.show',
@@ -188,7 +189,39 @@ class ProjectController extends Controller
             )
         );
     }
+    /**
+     * Statistics display api
+     */
+    public function statistics(Project $project)
+    {
+        $this->authorize('view', $project);
 
+        $taskStatusStats = Task::query()
+            ->where('project_id', $project->id)
+            ->where('status', '!=', 'archived')
+            ->select(
+                'status',
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('status')
+            ->get();
+
+        $taskTimeStats = Task::query()
+            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
+            ->where('tasks.project_id', $project->id)
+            ->select(
+                'tasks.title',
+                DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
+            )
+            ->groupBy('tasks.id', 'tasks.title')
+            ->orderByDesc('minutes')
+            ->get();
+
+        return response()->json([
+            'taskStatusStats' => $taskStatusStats,
+            'taskTimeStats' => $taskTimeStats,
+        ]);
+    }
 
     /**
      * Show the form for editing the specified resource.

@@ -1,9 +1,9 @@
 import './bootstrap';
 import '@fortawesome/fontawesome-free/css/all.css';
 
-import Alpine from 'alpinejs';
-window.Alpine = Alpine;
-Alpine.start();
+// import Alpine from 'alpinejs';
+// window.Alpine = Alpine;
+// Alpine.start();
 
 import { createApp } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
@@ -19,20 +19,24 @@ const app = createApp({
     data() {
         return {
             tab: 'info',
-            confirm: {
-                visible: false,
-                title: '',
-                message: '',
-                action: null,
-            }
+            confirmModalVisible: false,
+            confirmModalTitle: '',
+            confirmModalMessage: '',
+            confirmModalAction: null,
         };
     },
     methods: {
-        showConfirm(title,message, action){
-            this.confirm.title = title;
-            this.confirm.message = message;
-            this.confirm.action = action;
-            this.confirm.visible = true;
+        showConfirm(title, message, action){
+            this.confirmModalTitle = title;
+            this.confirmModalMessage = message;
+            this.confirmModalAction = action;
+            this.confirmModalVisible = true;
+        },
+        handleConfirm() {
+            if (this.confirmModalAction && typeof this.confirmModalAction === 'function') {
+                this.confirmModalAction();
+            }
+            this.confirmModalVisible = false;
         }
     }
 });
@@ -47,6 +51,15 @@ app.component('notification', Notification);
 app.component('user-search', UserSearch);
 app.component('confirmation-modal', ConfirmationModal);
 
-// Mount
-app.mount('#app');
+// mounts and stores the root component instance
+const vueAppInstance = app.mount('#app');
 
+// stores both the app and the instance globally
+window.vueApp = app;
+window.vueAppInstance = vueAppInstance;
+
+// listens for custom events to show the confirmation modal
+window.addEventListener('show-vue-confirm', e => {
+    const { title, message, action } = e.detail;
+    window.vueAppInstance.showConfirm(title, message, action);
+});

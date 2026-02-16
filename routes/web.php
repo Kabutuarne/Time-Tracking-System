@@ -11,7 +11,7 @@ use App\Http\Controllers\ProjectController;
 
 Route::get('/', function () {
     return view('home');
-});
+})->name('home');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -71,6 +71,13 @@ Route::scopeBindings()->group(function () {
         ->limit(10)
         ->get(['id','username','email']);
         });
+
+    // Statistics Vue route
+    Route::middleware('auth')->get(
+        '/projects/{project}/statistics',
+        [ProjectController::class, 'statistics']
+    )->name('projects.statistics');
+
 });
 Route::resource('users', UserController::class);
 // ->middleware('auth');

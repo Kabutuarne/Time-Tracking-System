@@ -63,5 +63,14 @@ trait HasProjectRoles
         
         return $roleHierarchy[$currentRole] >= $roleHierarchy[$minRole];
     }
-    
+    /*
+    * Check if user is in the project
+   */
+    public function isInProject($project): bool
+    {
+        if($this->roleInProject($project) == null)
+            return false;
+            else
+            return true;
+    }
 }

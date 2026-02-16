@@ -108,7 +108,7 @@
                         </div>
                         @can('update', $project)
                         <div class="w-full max-w-md">
-                            <div>
+                            <div id="app">
                                 <label class="block text-sm font-medium text-textcol">Add New Members</label>
                                 <user-search
                                     :initial-users='@json(old("users") ?? ($project->users->pluck("id") ?? []))'
@@ -147,19 +147,27 @@
                         <form method="POST" action="{{ route('projects.destroy', $project) }}">
                             @method('DELETE')
                             {{-- make it a danger button later --}}
-                            <x-forms.button> 
+                            <x-forms.danger-button
+                            :confirm="true"
+                            confirmMessage="Deleting this project will delete all of it's tasks, as well as the entries made will be forgotten forever!"
+                            confirmTitle="Warning!"
+                            > 
                                 <i class="fa-solid fa-trash mr-2 text-red-300"></i>
                                 <span class="text-red-300 font-bold">Delete Project</span>
-                            </x-forms.button>
+                            </x-forms.danger-button>
                         </form>
                     </div>  
                     @elsecan('softDelete', $project)
                         <div class="mt-8">
                             {{-- make it a danger button later --}}
-                            <x-forms.button href="{{ route('projects.archive', $project) }}">
+                            <x-forms.danger-button href="{{ route('projects.archive', $project) }}"
+                            :confirm="true"
+                            confirmMessage="Archiving this project will make it not accessible for anyone else"
+                            confirmTitle="Warning!"
+                            >
                                 <i class="fa-solid fa-trash mr-2 text-red-300"></i>
                                 <span class="text-red-300 font-bold">Archive Project</span>
-                            </x-forms.button>
+                            </x-forms.danger-button>
                         </div>
                     @endcan
                 </div>

@@ -1,4 +1,4 @@
-<a href="{{ route('projects.index') }}" class="group relative m-0 h-auto bg-transparent p-0 border-none cursor-pointer text-base tracking-[2px] uppercase font-['Arial'] text-transparent
+<a href="{{ route('home') }}" class="group relative m-0 h-auto bg-transparent p-0 border-none cursor-pointer text-base tracking-[2px] uppercase font-['Arial'] text-transparent
           [-webkit-text-stroke:1px_rgba(1,186,239,0.6)]
           scale-[1.5] origin-left">
     <span class="actual-text">&nbsp;TimeBase&nbsp;</span>

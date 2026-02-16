@@ -60,7 +60,8 @@
                                 <h3 class="text-lg font-semibold text-textcol mb-4">Account</h3>
                                 <ul class="space-y-2 text-textcol2">
                                     <li><strong class="text-textcol">Full name </strong> {{ $user->first_name }}
-                                        {{ $user->last_name }}</li>
+                                        {{ $user->last_name }}
+                                    </li>
                                     <li><strong class="text-textcol">Email </strong> {{ $user->email }}</li>
                                     <li><strong class="text-textcol">Joined </strong>
                                         {{ $user->created_at->toFormattedDateString() }}</li>

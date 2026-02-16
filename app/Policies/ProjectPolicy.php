@@ -35,7 +35,7 @@ class ProjectPolicy
                 return
                     $project->is_public ||
                     $user->id === $project->user_id || // owner
-                    $user->isInProject($project);
+                    $user->atLeastRoleInProject($project, 'member');
     }
     
     /**
@@ -79,5 +79,9 @@ class ProjectPolicy
     public function create(?User $user): bool //anyone logged in can create a project
     {
         return $user != null;
+    }
+    public function viewArchivedTasks(User $user, Project $project)
+    {
+        return $user->atLeastRoleInProject($project, 'manager');
     }
 }
