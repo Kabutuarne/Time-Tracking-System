@@ -49,9 +49,14 @@
                     @csrf
                     @method('DELETE')
 
-                    <x-forms.sm-button :secondary="true">
+                    <x-forms.danger-sm-button
+                    :secondary="true"
+                    :confirm="true"
+                    confirmTitle="Are you sure you want to leave this project?"
+                    confirmMessage="You will lose access to this project, but your made entries will stay. To gain access again, you will need to ask a project manager to re-invite you."
+                    >
                         Leave
-                    </x-forms.sm-button>
+                    </x-forms.danger-sm-button>
                 </form>
                 @endif
             @endif

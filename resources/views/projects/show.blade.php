@@ -116,8 +116,8 @@
                     </div>
 
                     {{-- Statistics --}}
-                    <div>
-                        <div id="app" class="mt-8">
+                    <div id="statistics-app">
+                        <div class="mt-8">
                             <h2 class="text-2xl font-bold text-textcol mb-4">Statistics</h2>
 
                             <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">

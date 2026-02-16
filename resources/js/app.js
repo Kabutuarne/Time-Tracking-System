@@ -49,23 +49,24 @@ const app = createApp({
         }
     }
 });
-
+const statisticsApp = createApp({});
 // Plugins
 app.use(VueApexCharts);
 
 // Global components
-app.component('project-statistics', ProjectStatistics);
-app.component('weekly-worked-time', WeeklyWorkedTime);
+statisticsApp.component('project-statistics', ProjectStatistics);
+statisticsApp.component('weekly-worked-time', WeeklyWorkedTime);
 app.component('notification', Notification);
 app.component('user-search', UserSearch);
 app.component('confirmation-modal', ConfirmationModal);
 
 // mounts and stores the root component instance
 const vueAppInstance = app.mount('#app');
-
+const vueAppInstance2 = statisticsApp.mount('#statistics-app');
 // stores both the app and the instance globally
 window.vueApp = app;
 window.vueAppInstance = vueAppInstance;
+window.vueAppInstance2 = vueAppInstance2;
 
 // listens for custom events to show the confirmation modal
 window.addEventListener('show-vue-confirm', e => {

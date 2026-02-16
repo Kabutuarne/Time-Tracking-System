@@ -1,7 +1,7 @@
 <x-layout>
     <x-slot:title>{{ $user->username }}</x-slot:title>
 
-    <div id="app" class="relative min-h-screen w-full bg-darker overflow-hidden">
+    <div class="relative min-h-screen w-full bg-darker overflow-hidden">
 
         <div
             class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/0 blur-3xl">
@@ -29,7 +29,7 @@
                     </div>
                 </div>
 
-                <div class="p-10 space-y-8">
+                <div x-data="{ tab: 'info' }" class="p-10 space-y-8">
 
                     {{-- Tab Buttons --}}
                     <div class="flex gap-3 border-b border-white/5 pb-4">
@@ -53,7 +53,7 @@
                     </div>
 
                     {{-- USER INFO --}}
-                    <div v-show="tab === 'info'" class="space-y-6">
+                    <div x-show="tab === 'info'" class="space-y-6">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
                             <div class="rounded-xl bg-slate-950/40 p-6 ring-1 ring-white/5">
@@ -98,7 +98,7 @@
                     </div>
 
                     {{-- PROJECTS --}}
-                    <div v-show="tab === 'projects'" class="space-y-8">
+                    <div x-show="tab === 'projects'" class="space-y-8">
 
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
@@ -130,7 +130,7 @@
                     </div>
 
                     {{-- STATISTICS --}}
-                    <div v-show="tab === 'summary'">
+                    <div id="statistics-app" x-show="tab === 'summary'">
                         <weekly-worked-time :weekly-work='@json($weeklyWork)' />
                     </div>
 

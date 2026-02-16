@@ -9,21 +9,69 @@ new class extends Component {
 
     public Project $project;
 
+    public string $filter = 'all'; // default: all
+    public string $sortOrder = 'latest'; // default: latest
+
     protected $paginationTheme = 'tailwind';
+
+
+    public function updatingFilter()
+    {
+        $this->resetPage('entries_page');
+    }
+
+    public function updatingSortOrder()
+    {
+        $this->resetPage('entries_page');
+    }
+
+    public function toggleSort()
+    {
+        $this->sortOrder = $this->sortOrder === 'latest' ? 'oldest' : 'latest';
+        $this->resetPage('entries_page');
+    }
 
     public function render()
     {
-        return $this->view([
-            'entries' => $this->project->entries()
-                ->latest()
-                ->with(['user', 'task', 'project'])
-                ->paginate(5, ['*'], 'entries_page'),
-        ]);
+        if ($this->filter === 'yours') {
+            return $this->view([
+                'entries' => $this->project->entries()
+                    ->latest()
+                    ->with(['user', 'task', 'project'])
+                    ->where('user_id', auth()->id())
+                    ->orderBy('created_at', $this->sortOrder === 'latest' ? 'desc' : 'asc')
+                    ->paginate(5, ['*'], 'entries_page'),
+            ]);
+        } else {
+            return $this->view([
+                'entries' => $this->project->entries()
+                    ->latest()
+                    ->with(['user', 'task', 'project'])
+                    ->orderBy('created_at', $this->sortOrder === 'latest' ? 'desc' : 'asc')
+                    ->paginate(5, ['*'], 'entries_page'),
+            ]);
+        }
     }
 };
 ?>
 
 <div>
+    <div class="flex flex-wrap gap-2 mb-3">
+        {{-- Filter buttons --}}
+        <x-forms.sm-filter-button wire:click="$set('filter','all')" :selected="$filter === 'all'">
+            All
+        </x-forms.sm-filter-button>
+
+        <x-forms.sm-filter-button wire:click="$set('filter','yours')" :selected="$filter === 'yours'">
+            Your Entries
+        </x-forms.sm-filter-button>
+
+        {{-- Sort toggle --}}
+        <x-forms.sm-filter-button :secondary="true" wire:click="toggleSort">
+            {{ $sortOrder === 'latest' ? 'Latest' : 'Oldest' }}
+        </x-forms.sm-filter-button>
+    </div>
+
     <div class="space-y-4">
         @forelse ($entries as $entry)
             <x-projects.entry-card :entry="$entry" :project="$project" />
@@ -35,6 +83,5 @@ new class extends Component {
         @endforelse
 
         {{ $entries->links('custom-pagination', ['pagename' => 'entries_page']) }}
-
     </div>
 </div>
