@@ -28,31 +28,29 @@
 </head>
 
 <body class="bg-dark">
-    <div id="app">
+    <div>
         <x-nav />
+        <div id="app">
+            @php
+                $flashData = [];
+                if (session()->has('success'))
+                    $flashData['success'] = session('success');
+                if (session()->has('error'))
+                    $flashData['error'] = session('error');
+                if (session()->has('warning'))
+                    $flashData['warning'] = session('warning');
+                if (session()->has('info'))
+                    $flashData['info'] = session('info');
+            @endphp
 
+            <notification :flash-data='@json($flashData)'></notification>
+
+            <confirmation-modal :visible="confirmModalVisible" :title="confirmModalTitle" :message="confirmModalMessage"
+                @update:visible="confirmModalVisible = $event" @confirmed="handleConfirm" />
+        </div>
         <main class="container mx-auto px-4 py-8">
             {{ $slot }}
         </main>
-
-        {{-- Vue Components - Notification and Confirmation Modal --}}
-        @php
-            $flashData = [];
-            if (session()->has('success'))
-                $flashData['success'] = session('success');
-            if (session()->has('error'))
-                $flashData['error'] = session('error');
-            if (session()->has('warning'))
-                $flashData['warning'] = session('warning');
-            if (session()->has('info'))
-                $flashData['info'] = session('info');
-        @endphp
-
-        <notification :flash-data='@json($flashData)'></notification>
-
-        {{-- FIXED: Use the new flat property names instead of nested confirm object --}}
-        <confirmation-modal :visible="confirmModalVisible" :title="confirmModalTitle" :message="confirmModalMessage"
-            @update:visible="confirmModalVisible = $event" @confirmed="handleConfirm" />
     </div>
 
     @livewireScripts

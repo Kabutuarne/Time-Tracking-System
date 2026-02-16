@@ -12,20 +12,13 @@
         min: {{ (int) $min }},
         max: {{ (int) $max }},
         step: {{ (int) $step }},
-        inc() {
-            this.minutes = Math.min(this.minutes + this.step, this.max)
-        },
-        dec() {
-            this.minutes = Math.max(this.minutes - this.step, this.min)
-        }
+        inc() { this.minutes = Math.min(this.minutes + this.step, this.max) },
+        dec() { this.minutes = Math.max(this.minutes - this.step, this.min) }
     }"
     class="flex items-center gap-2"
 >
-    {{-- minus --}}
-    <x-forms.sm-button
-        type="button"
-        @click="dec"
-    >
+    {{-- minus button --}}
+    <x-forms.sm-button type="button" @click="dec">
         −
     </x-forms.sm-button>
 
@@ -43,11 +36,8 @@
         >
     </div>
 
-    {{-- plus --}}
-    <x-forms.sm-button
-        type="button"
-        @click="inc"
-    >
+    {{-- plus button --}}
+    <x-forms.sm-button type="button" @click="inc">
         +
     </x-forms.sm-button>
 </div>

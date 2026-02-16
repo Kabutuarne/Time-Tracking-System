@@ -3,7 +3,16 @@ import '@fortawesome/fontawesome-free/css/all.css';
 
 // import Alpine from 'alpinejs';
 // window.Alpine = Alpine;
-// Alpine.start();
+// // Alpine.start();
+const Alpine = window.Alpine;
+
+// alpine import
+Alpine.data('myComponent', () => ({
+    count: 0,
+    increment() {
+        this.count++
+    }
+}));
 
 import { createApp } from 'vue';
 import VueApexCharts from 'vue3-apexcharts';
