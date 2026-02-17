@@ -7,6 +7,7 @@ use App\Models\Entry;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -192,10 +193,22 @@ class ProjectController extends Controller
     /**
      * Statistics display api
      */
-    public function statistics(Project $project)
+    public function statistics(Request $request, Project $project)
     {
         $this->authorize('view', $project);
 
+        // Get week parameter (format: YYYY-MM-DD for start of week)
+        $weekStart = $request->query('week_start');
+        if ($weekStart) {
+            $weekStart = Carbon::createFromFormat('Y-m-d', $weekStart)->startOfDay();
+        } else {
+            $weekStart = now()->startOfWeek();
+        }
+        $weekEnd = $weekStart->copy()->endOfWeek();
+        $previousWeekStart = $weekStart->copy()->subWeek()->startOfWeek();
+        $nextWeekStart = $weekStart->copy()->addWeek()->startOfWeek();
+        
+        // Task status stats for donut chart (excluding archived tasks)
         $taskStatusStats = Task::query()
             ->where('project_id', $project->id)
             ->where('status', '!=', 'archived')
@@ -205,10 +218,11 @@ class ProjectController extends Controller
             )
             ->groupBy('status')
             ->get();
-
+        // Task time stats for bar chart
         $taskTimeStats = Task::query()
             ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
             ->where('tasks.project_id', $project->id)
+            ->where('tasks.status', '!=', 'archived')
             ->select(
                 'tasks.title',
                 DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
@@ -217,9 +231,74 @@ class ProjectController extends Controller
             ->orderByDesc('minutes')
             ->get();
 
+        // Weekly summary data
+        $weeklyUserActivity = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->join('users', 'users.id', '=', 'entries.user_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+            ->select(
+                'users.id',
+                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as name"),
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy('users.id')
+            ->orderByDesc('total_minutes')
+            ->get();
+
+        // Daily breakdown for the week
+        $dailyActivityBreakdown = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+            ->select(
+                DB::raw('DATE(entries.created_at) as date'),
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy(DB::raw('DATE(entries.created_at)'))
+            ->orderBy('date')
+            ->get();
+
+        // Task completions this week
+        $tasksCompletedThisWeek = Task::query()
+            ->where('project_id', $project->id)
+            ->where('status', 'completed')
+            ->whereBetween('updated_at', [$weekStart, $weekEnd])
+            ->count();
+
+        // Overall weekly stats
+        $weeklyStats = [
+            'total_entries' => Entry::query()
+                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+                ->where('tasks.project_id', $project->id)
+                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+                ->count(),
+            'total_minutes' => Entry::query()
+                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+                ->where('tasks.project_id', $project->id)
+                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+                ->sum('entries.minutes') ?? 0,
+            'total_users' => Entry::query()
+                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+                ->where('tasks.project_id', $project->id)
+                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+                ->distinct('entries.user_id')
+                ->count('entries.user_id'),
+            'tasks_completed' => $tasksCompletedThisWeek,
+        ];
+
         return response()->json([
             'taskStatusStats' => $taskStatusStats,
             'taskTimeStats' => $taskTimeStats,
+            'weeklyUserActivity' => $weeklyUserActivity,
+            'dailyActivityBreakdown' => $dailyActivityBreakdown,
+            'weeklyStats' => $weeklyStats,
+            'weekStart' => $weekStart->format('Y-m-d'),
+            'weekEnd' => $weekEnd->format('Y-m-d'),
+            'previousWeekStart' => $previousWeekStart->format('Y-m-d'),
+            'nextWeekStart' => $nextWeekStart->format('Y-m-d'),
         ]);
     }
 
