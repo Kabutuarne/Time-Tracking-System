@@ -50,6 +50,7 @@ const app = createApp({
     }
 });
 const statisticsApp = createApp({});
+const searchApp = createApp({});
 // Plugins
 app.use(VueApexCharts);
 
@@ -57,16 +58,18 @@ app.use(VueApexCharts);
 statisticsApp.component('project-statistics', ProjectStatistics);
 statisticsApp.component('weekly-worked-time', WeeklyWorkedTime);
 app.component('notification', Notification);
-app.component('user-search', UserSearch);
+searchApp.component('user-search', UserSearch);
 app.component('confirmation-modal', ConfirmationModal);
 
 // mounts and stores the root component instance
 const vueAppInstance = app.mount('#app');
 const vueAppInstance2 = statisticsApp.mount('#statistics-app');
+const vueSearchAppInstance = searchApp.mount('#search-app');
 // stores both the app and the instance globally
 window.vueApp = app;
 window.vueAppInstance = vueAppInstance;
 window.vueAppInstance2 = vueAppInstance2;
+window.vueSearchAppInstance = vueSearchAppInstance;
 
 // listens for custom events to show the confirmation modal
 window.addEventListener('show-vue-confirm', e => {

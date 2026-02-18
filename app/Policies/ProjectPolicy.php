@@ -8,12 +8,17 @@ use App\Models\User;
 class ProjectPolicy
 {  
     /**
-     * Get user's role in project
+     * Get user's role in project - uses pre-loaded relationship if available
      */
     public function getUserRole(User $user, Project $project): ?string
     {
-        $projectUser = $user->projects()
-            ->wherePivot('project_id', $project->id)
+        // Preload projects if not already loaded to avoid N+1 queries
+        if (!$user->relationLoaded('projects')) {
+            $user->load('projects');
+        }
+        
+        $projectUser = $user->projects
+            ->where('id', $project->id)
             ->first();
             
         return $projectUser ? $projectUser->pivot->role : null;

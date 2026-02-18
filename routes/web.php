@@ -13,16 +13,16 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
+// Route::middleware('auth')->group(function () {
+//     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+//     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// });
 
 
 // nested resource routes
@@ -77,6 +77,12 @@ Route::scopeBindings()->group(function () {
         '/projects/{project}/statistics',
         [ProjectController::class, 'statistics']
     )->name('projects.statistics');
+
+    // Export statistics route
+    Route::get(
+        '/projects/{project}/statistics/export',
+        [ProjectController::class, 'export']
+    )->name('projects.statistics.export');
 
 });
 Route::resource('users', UserController::class);

@@ -11,32 +11,32 @@ use App\Http\Requests\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
-    public function show(): View
-    {
-        return view('profile.show', [
-            'user' => Auth::user(),
-        ]);
-    }
+    // public function show(): View
+    // {
+    //     return view('profile.show', [
+    //         'user' => Auth::user(),
+    //     ]);
+    // }
 
-    public function edit(): View
-    {
-        return view('profile.edit', [
-            'user' => Auth::user(),
-        ]);
-    }
+    // public function edit(): View
+    // {
+    //     return view('profile.edit', [
+    //         'user' => Auth::user(),
+    //     ]);
+    // }
 
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
+    // public function update(ProfileUpdateRequest $request): RedirectResponse
+    // {
+    //     $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-        }
+    //     if ($request->user()->isDirty('email')) {
+    //         $request->user()->email_verified_at = null;
+    //     }
 
-        $request->user()->save();
+    //     $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
-    }
+    //     return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    // }
 
     public function destroy(Request $request): RedirectResponse
     {
@@ -52,6 +52,6 @@ class ProfileController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return Redirect::to('home');
     }
 }

@@ -88,6 +88,13 @@ class ProjectController extends Controller
 
         // use of policy
         $this->authorize('view', $project);
+        
+        // Pre-load user's projects with pivot data to avoid N+1 queries in policies
+        $user = Auth::user();
+        if ($user) {
+            $user->load('projects');
+        }
+        
         // preload users
         $project->load('user', 'users');
 
@@ -164,13 +171,13 @@ class ProjectController extends Controller
             ->get();
 
 
-        // entry pagination
+        // entry pagination - pre-load project relationship to avoid queries in policies
         $entries = $project->entries()
             ->latest()
             ->with(['user', 'task', 'project']);
             // ->paginate(5, ['*'], 'entries_page');
 
-        // task pagination
+        // task pagination - pre-load project relationship to avoid queries in policies
         $tasks = $project->tasks()
             ->latest()
             ->with('project');
@@ -375,4 +382,56 @@ class ProjectController extends Controller
         $project->save();
         return redirect()->back()->with('success', 'Project succesfully restored!');
     }
-}
+        /**     * Export the statistics for the specified week as CSV.     */
+    public function export(Request $request, Project $project)
+    {
+        $this->authorize('view', $project);
+
+        $weekStart = $request->week_start
+            ? Carbon::createFromFormat('Y-m-d', $request->week_start)->startOfDay()
+            : now()->startOfWeek();
+
+        $weekEnd = $weekStart->copy()->endOfWeek();
+
+        return response()->streamDownload(function () use ($project, $weekStart, $weekEnd) {
+
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Date',
+                'User',
+                'Task',
+                'Minutes',
+                'Hours'
+            ]);
+
+            Entry::query()
+                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+                ->join('users', 'users.id', '=', 'entries.user_id')
+                ->where('tasks.project_id', $project->id)
+                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+                ->select(
+                    'entries.created_at',
+                    DB::raw("CONCAT(users.first_name, ' ', users.last_name) as name"),
+                    'tasks.title',
+                    'entries.minutes'
+                )
+                ->orderBy('entries.created_at')
+                ->chunk(500, function ($rows) use ($handle) {
+                    foreach ($rows as $row) {
+                        fputcsv($handle, [
+                            Carbon::parse($row->created_at)->format('Y-m-d'),
+                            $row->name,
+                            $row->title,
+                            $row->minutes,
+                            round($row->minutes / 60, 2),
+                        ]);
+                    }
+                });
+
+            fclose($handle);
+
+        }, "weekly_statistics_{$weekStart->format('Y_m_d')}.csv");
+    }
+
+    }

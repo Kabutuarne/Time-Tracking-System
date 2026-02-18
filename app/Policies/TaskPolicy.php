@@ -15,19 +15,34 @@ class TaskPolicy
     //     && ($task->project->status == 'active' || 'on-hold'); //can only add new tasks to active projects
     // }
 
+    /**
+     * Ensure project relationship is loaded to avoid duplicate queries
+     */
+    protected function ensureProjectLoaded(Task $task): Project
+    {
+        if (!$task->relationLoaded('project')) {
+            $task->load('project');
+        }
+        return $task->project;
+    }
+
     public function createEntry(User $user, Task $task): bool
     {
-        return $user->atLeastRoleInProject($task->project, 'member')
+        $project = $this->ensureProjectLoaded($task);
+        
+        return $user->atLeastRoleInProject($project, 'member')
         && $task->status === 'in_progress'
-        && $task->project->status === 'active';
+        && $project->status === 'active';
     }
     /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Task $task): bool
     {
-        return $user->atLeastRoleInProject($task->project, 'manager')
-        && in_array($task->project->status, ['active', 'on-hold'], true);
+        $project = $this->ensureProjectLoaded($task);
+        
+        return $user->atLeastRoleInProject($project, 'manager')
+        && in_array($project->status, ['active', 'on-hold'], true);
     }
     
     /**
@@ -35,15 +50,19 @@ class TaskPolicy
      */
     public function softDelete(User $user, Task $task): bool
     {
-        return $user->atLeastRoleInProject($task->project, 'manager')
-        && in_array($task->project->status, ['active', 'on-hold'], true);
+        $project = $this->ensureProjectLoaded($task);
+        
+        return $user->atLeastRoleInProject($project, 'manager')
+        && in_array($project->status, ['active', 'on-hold'], true);
     }
     /**
      * Determine whether the user can permanently delete the model.
      */
     public function delete(User $user, Task $task): bool
     {
-        return $user->id === $task->project->user_id
-        && in_array($task->project->status, ['active', 'on-hold'], true);//can only owner
+        $project = $this->ensureProjectLoaded($task);
+        
+        return $user->id === $project->user_id
+        && in_array($project->status, ['active', 'on-hold'], true);//can only owner
     }
 }

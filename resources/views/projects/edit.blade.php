@@ -108,7 +108,7 @@
                         </div>
                         @can('update', $project)
                         <div class="w-full max-w-md">
-                            <div id="app">
+                            <div id="search-app">
                                 <label class="block text-sm font-medium text-textcol">Add New Members</label>
                                 <user-search
                                     :initial-users='@json(old("users") ?? ($project->users->pluck("id") ?? []))'

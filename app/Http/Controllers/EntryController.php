@@ -6,8 +6,6 @@ use App\Models\Task;
 use App\Models\Entry;
 use App\Models\Project;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 
 class EntryController extends Controller
 {

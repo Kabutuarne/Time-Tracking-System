@@ -33,25 +33,19 @@ new class extends Component {
 
     public function render()
     {
+        $query = $this->project->entries()
+            ->with(['user', 'task', 'project'])
+            ->orderBy('created_at', $this->sortOrder === 'latest' ? 'desc' : 'asc');
+
         if ($this->filter === 'yours') {
-            return $this->view([
-                'entries' => $this->project->entries()
-                    ->latest()
-                    ->with(['user', 'task', 'project'])
-                    ->where('user_id', auth()->id())
-                    ->orderBy('created_at', $this->sortOrder === 'latest' ? 'desc' : 'asc')
-                    ->paginate(5, ['*'], 'entries_page'),
-            ]);
-        } else {
-            return $this->view([
-                'entries' => $this->project->entries()
-                    ->latest()
-                    ->with(['user', 'task', 'project'])
-                    ->orderBy('created_at', $this->sortOrder === 'latest' ? 'desc' : 'asc')
-                    ->paginate(5, ['*'], 'entries_page'),
-            ]);
+            $query->where('user_id', auth()->id());
         }
+
+        return $this->view([
+            'entries' => $query->paginate(5, ['*'], 'entries_page'),
+        ]);
     }
+
 };
 ?>
 

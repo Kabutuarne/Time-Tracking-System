@@ -1,4 +1,4 @@
-<x-guest-layout>
+<x-layout>
     <div class="flex items-center justify-center min-h-[80vh]">
         <article class="w-full max-w-md group/card">
             <div class="relative rounded-xl bg-slate-950/40 p-8 shadow-xl transition-all duration-300">
@@ -54,4 +54,4 @@
             </div>
         </article>
     </div>
-</x-guest-layout>
+</x-layout>

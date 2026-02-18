@@ -75,19 +75,32 @@
                     >
                         <i class="fas fa-chevron-left"></i>
                     </button>
+
                     <div class="text-center">
                         <p class="text-sm font-semibold text-textcol2">Week of</p>
                         <p class="text-lg font-bold text-textcol">
                             {{ formatDate(weekStart) }} to {{ formatDate(weekEnd) }}
                         </p>
                     </div>
-                    <button
-                        @click="nextWeek"
-                        class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-textcol transition-colors"
-                    >
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+
+                    <div class="flex items-center gap-3">
+                        <button
+                            @click="exportWeek"
+                            class="px-4 py-2 rounded-lg bg-primary hover:bg-primary/80 text-white text-sm font-semibold transition-colors"
+                        >
+                            <i class="fas fa-file-csv mr-2"></i>
+                            Export CSV
+                        </button>
+
+                        <button
+                            @click="nextWeek"
+                            class="p-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-textcol transition-colors"
+                        >
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
+
 
                 <!-- Key metrics -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -286,6 +299,10 @@ export default {
             } finally {
                 this.loading = false;
             }
+        },
+        exportWeek() {
+            const url = `/projects/${this.projectId}/statistics/export?week_start=${this.weekStart}`;
+            window.open(url, "_blank");
         },
 
         previousWeek() {

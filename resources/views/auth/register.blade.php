@@ -1,4 +1,5 @@
-<x-guest-layout>
+<x-layout>
+    <x-slot:title>Register an Account</x-slot:title>
     <div class="flex items-center justify-center min-h-[80vh]">
         <article class="w-full max-w-md group/card">
             <div class="relative rounded-xl bg-slate-950/40 p-8 shadow-xl transition-all duration-300">
@@ -13,13 +14,13 @@
                     {{-- first name --}}
                     <div>
                         <x-forms.input id="first_name" type="text" name="first_name" :value="old('first_name')" required
-                            autofocus autocomplete="username" placeholder="First Name" />
+                            autofocus autocomplete="firstname" placeholder="First Name" />
                         <x-forms.input-error :messages="$errors->get('first_name')" class="mt-2" />
                     </div>
                     {{-- last name --}}
                     <div>
                         <x-forms.input id="last_name" type="text" name="last_name" :value="old('last_name')" required
-                            autofocus autocomplete="username" placeholder="Last Name" />
+                            autofocus autocomplete="lastname" placeholder="Last Name" />
                         <x-forms.input-error :messages="$errors->get('last_name')" class="mt-2" />
                     </div>
                     {{-- username --}}
@@ -32,7 +33,7 @@
                     {{-- email --}}
                     <div>
                         <x-forms.input id="email" type="email" name="email" :value="old('email')" required autofocus
-                            autocomplete="username" placeholder="example@email.com" />
+                            autocomplete="email" placeholder="example@email.com" />
                         <x-forms.input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 
@@ -78,4 +79,4 @@
             </div>
         </article>
     </div>
-</x-guest-layout>
+</x-layout>

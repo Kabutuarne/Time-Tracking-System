@@ -7,24 +7,47 @@ use App\Models\Project;
 trait HasProjectRoles
 {
     /**
+     * cache for role lookups
+     */
+    protected array $roleCache = [];
+
+    /**
      * Get user's role in specific project
      */
     public function roleInProject(Project $project): ?string
     {
-        $projectUser = $this->projects()
-            ->wherePivot('project_id', $project->id)
-            ->first();
-            
-        if ($projectUser) {
-            return $projectUser->pivot->role;
+        // return cached role if available
+        if (isset($this->roleCache[$project->id])) {
+            return $this->roleCache[$project->id];
         }
         
         // Check if user is project owner
         if ($this->id === $project->user_id) {
-            return 'owner';
+            return $this->roleCache[$project->id] = 'owner';
+        }
+
+        // check if user is a menber through the pivot table
+        // Try to use already loaded relationships first
+        if ($this->relationLoaded('projects')) {
+            $projectUser = $this->projects
+                ->where('id', $project->id)
+                ->first();
+            
+            if ($projectUser) {
+                return $this->roleCache[$project->id] = $projectUser->pivot->role;
+            }
+        } else {
+            // Only query if relationships aren't pre-loaded
+            $projectUser = $this->projects()
+                ->wherePivot('project_id', $project->id)
+                ->first();
+                
+            if ($projectUser) {
+                return $this->roleCache[$project->id] = $projectUser->pivot->role;
+            }
         }
         
-        return null;
+        return $this->roleCache[$project->id] = null;
     }
     
     /**
