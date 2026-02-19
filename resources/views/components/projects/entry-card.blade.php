@@ -17,7 +17,8 @@
                             </span>
                         </div>
                         <div>
-                            @if ($project->users->contains($entry->user))
+                            {{-- if user is not a part of the project at all --}}
+                            @if ($project->users->contains($entry->user) || $entry->user_id === $project->user_id)
                                 <p class="text-sm font-medium text-textcol">
                                     {{ $entry->user->username }}
                                 </p>

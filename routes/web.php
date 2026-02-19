@@ -15,7 +15,11 @@ Route::resource('projects', ProjectController::class)->scoped();
 Route::resource('projects.tasks', TaskController::class)->scoped();
 Route::resource('projects.tasks.entries', EntryController::class)->scoped();
 
-// Additional CRUD and Custom Routes
+// --- User Search  ---
+Route::get('users/search', [UserController::class, 'search'])
+    ->name('users.search');
+
+// Additional Routes
 Route::resource('users', UserController::class);
 
 // Scoped Routes (Project, Task, and Statistics Management)
@@ -39,10 +43,6 @@ Route::scopeBindings()->group(function () {
         ->name('projects.archive');
     Route::get('projects/{project}/restore', [ProjectController::class, 'restore'])
         ->name('projects.restore');
-
-    // --- User Search ---
-    Route::get('users/search', [UserController::class, 'search'])
-        ->name('users.search');
 
     // --- Statistics & Export ---
     Route::middleware('auth')->get('projects/{project}/statistics', [ProjectController::class, 'statistics'])
