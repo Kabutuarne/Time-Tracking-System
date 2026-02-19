@@ -6,24 +6,16 @@ use App\Models\Task;
 use App\Models\Entry;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class EntryController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        
-    }
-
-    /**
      * Show the form for creating a new resource.
      */
     public function create(Project $project, Task $task)
     {
-        // abort_unless($task->project_id === $project->id, 403); redundant code
         $this->authorize('createEntry', $task);
         return view('entries.create', [
         'project' => $project,    
@@ -57,26 +49,17 @@ class EntryController extends Controller
 
         Entry::create([
             'task_id' => $task->id,
-            // 'user_id' => auth()->id,
-            'user_id' => 1, // for now just 1
+            'user_id' => Auth::id(),
             'work_date' => $validated['work_date'],
             'minutes' => $validated['minutes'],
             'description' => $validated['description'] ?? null,
         ]);
+
         if ($request->boolean('mark_complete')) {
-            // $task->markComplete(Auth::id());
-            $task->markComplete(1);
+            $task->markComplete(Auth::id());
         }
         return redirect()
             ->route('projects.show', $project);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Entry $entry)
-    {
-        //
     }
 
     /**
@@ -84,7 +67,7 @@ class EntryController extends Controller
      */
     public function edit(Project $project, Task $task, Entry $entry)
     {
-         $this->authorize('update', $entry);
+        $this->authorize('update', $entry);
         return view('entries.edit', compact( 'project','task','entry'));
     }
 
@@ -112,7 +95,8 @@ class EntryController extends Controller
         $validated = $validator->validated();
         $entry->update($validated);
         return redirect()
-            ->route('projects.show', $project)->with('success', 'Entry succesfully created!');
+            ->route('projects.show', $project)
+            ->with('success', 'Entry successfully updated!');
     }
 
     /**
@@ -122,7 +106,7 @@ class EntryController extends Controller
     {
         $this->authorize('delete', $entry);
         $entry->delete();
-        return back()->with('success', 'Entry succesfully deleted!');
+        return back()->with('success', 'Entry successfully deleted!');
     }
 
 }

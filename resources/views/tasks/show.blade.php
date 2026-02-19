@@ -125,7 +125,7 @@
                     {{-- Task Entries --}}
                     <div class="space-y-4">
                         <h2 class="text-2xl font-bold text-textcol">Task Entries</h2>
-                        @livewire('project-entries', ['project' => $project])
+                        @livewire('task-entries', ['project' => $project, 'task' => $task])
                     </div>
 
                 </div>

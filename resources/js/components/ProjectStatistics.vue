@@ -86,7 +86,7 @@
                     <div class="flex items-center gap-3">
                         <button
                             @click="exportWeek"
-                            class="px-4 py-2 rounded-lg bg-primary hover:bg-primary/80 text-white text-sm font-semibold transition-colors"
+                            class="px-4 py-2 rounded-lg bg-primary/10 hover:bg-primary/90 text-primary hover:text-textcol text-sm font-semibold transition-colors"
                         >
                             <i class="fas fa-file-csv mr-2"></i>
                             Export CSV

@@ -21,7 +21,6 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        // improved readability
         $projects = Project::query()
             ->with('user')
             ->withCount([
@@ -85,8 +84,9 @@ class ProjectController extends Controller
             $project->users()->attach($validated['users'], ['role' => 'member']);
         }
 
-        // redirect
-        return redirect()->route('projects.show', $project)->with('success', 'Project succesfully created!');
+        // Redirect
+        return redirect()->route('projects.show', $project)
+            ->with('success', 'Project successfully created!');
     }
 
     /**
@@ -96,103 +96,32 @@ class ProjectController extends Controller
 
     public function show(Project $project)
     {
-
-        // use of policy
         $this->authorize('view', $project);
-        
+
         // Pre-load user's projects with pivot data to avoid N+1 queries in policies
         $user = Auth::user();
         if ($user) {
             $user->load('projects');
         }
-        
-        // preload users
+
+        // Preload users
         $project->load('user', 'users');
 
-        // preload entry count and total minutes per user
-        $userStats = Entry::query()
-            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-            ->where('tasks.project_id', $project->id)
-            ->select(
-                'entries.user_id',
-                DB::raw('COUNT(entries.id) as entry_count'), // total entries per user
-                DB::raw('SUM(entries.minutes) as total_minutes') // total minutes per user
-            )
-            ->groupBy('entries.user_id')
-            ->get()
-            ->keyBy('user_id');
+        // Get all statistics
+        $userStats = $this->getUserStats($project);
+        $projectStats = $this->getProjectStats($project);
+        $weeklyUserStats = $this->getWeeklyUserStats($project);
+        $taskStatusStats = $this->getTaskStatusStats($project);
+        $taskTimeStats = $this->getTaskTimeStats($project);
 
-        // preload project stats: total tasks, total minutes, total entries for the project
-        $projectStats = Project::query()
-            ->join('tasks', 'tasks.project_id', '=', 'projects.id') // join tasks table
-            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id') // left join entries table
-            ->where('projects.id', $project->id)
-            ->select(
-                'projects.id',
-                DB::raw('COUNT(DISTINCT tasks.id) as total_task_count'), // total task count
-                DB::raw('COALESCE(SUM(entries.minutes), 0) as total_minutes'), // total minutes
-                DB::raw('COUNT(entries.id) as total_entry_count') // total entry count
-            )
-            ->groupBy('projects.id')
-            ->get()
-            ->keyBy('id');
-
-        // Weekly user stats for "Weekly Effort" and "Entries" tabs
-        $weeklyUserStats = Entry::query()
-            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-            ->join('users', 'users.id', '=', 'entries.user_id')
-            ->where('tasks.project_id', $project->id)
-            ->whereBetween('entries.created_at', [
-                now()->startOfWeek(),
-                now()->endOfWeek()
-            ])
-            ->select(
-                'entries.user_id',
-                DB::raw('SUM(entries.minutes) as total_minutes'),
-                DB::raw('COUNT(entries.id) as entry_count')
-            )
-            ->groupBy('entries.user_id')
-            ->get()
-            ->map(function ($stat) {
-                $stat->user = User::find($stat->user_id);
-                return $stat;
-            });
-
-        // Task status stats for "Tasks" tab (for donut chart) without archived ones
-        $taskStatusStats = Task::query()
-            ->where('project_id', $project->id)
-            ->where('status', '!=', 'archived')
-            ->select(
-                'status',
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy('status')
-            ->get();
-            
-        // Total time per task (for bar chart)
-        $taskTimeStats = Task::query()
-            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
-            ->where('tasks.project_id', $project->id)
-            ->select(
-                'tasks.title',
-                DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
-            )
-            ->groupBy('tasks.id', 'tasks.title')
-            ->orderByDesc('minutes')
-            ->get();
-
-
-        // entry pagination - pre-load project relationship to avoid queries in policies
+        // Entries and tasks pagination are handled by Livewire
         $entries = $project->entries()
             ->latest()
             ->with(['user', 'task', 'project']);
-            // ->paginate(5, ['*'], 'entries_page');
 
-        // task pagination - pre-load project relationship to avoid queries in policies
         $tasks = $project->tasks()
             ->latest()
             ->with('project');
-            // ->paginate(5, ['*'], 'tasks_page');
 
         return view(
             'projects.show',
@@ -209,103 +138,30 @@ class ProjectController extends Controller
         );
     }
     /**
-     * Statistics display api
+     * Get project statistics for a specific week (API endpoint).
      */
     public function statistics(Request $request, Project $project)
     {
         $this->authorize('view', $project);
 
-        // Get week parameter (format: YYYY-MM-DD for start of week)
+        // Parse week parameter
         $weekStart = $request->query('week_start');
         if ($weekStart) {
             $weekStart = Carbon::createFromFormat('Y-m-d', $weekStart)->startOfDay();
         } else {
             $weekStart = now()->startOfWeek();
         }
+
         $weekEnd = $weekStart->copy()->endOfWeek();
         $previousWeekStart = $weekStart->copy()->subWeek()->startOfWeek();
         $nextWeekStart = $weekStart->copy()->addWeek()->startOfWeek();
-        
-        // Task status stats for donut chart (excluding archived tasks)
-        $taskStatusStats = Task::query()
-            ->where('project_id', $project->id)
-            ->where('status', '!=', 'archived')
-            ->select(
-                'status',
-                DB::raw('COUNT(*) as count')
-            )
-            ->groupBy('status')
-            ->get();
-        // Task time stats for bar chart
-        $taskTimeStats = Task::query()
-            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
-            ->where('tasks.project_id', $project->id)
-            ->where('tasks.status', '!=', 'archived')
-            ->select(
-                'tasks.title',
-                DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
-            )
-            ->groupBy('tasks.id', 'tasks.title')
-            ->orderByDesc('minutes')
-            ->get();
 
-        // Weekly summary data
-        $weeklyUserActivity = Entry::query()
-            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-            ->join('users', 'users.id', '=', 'entries.user_id')
-            ->where('tasks.project_id', $project->id)
-            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
-            ->select(
-                'users.id',
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as name"),
-                DB::raw('COUNT(entries.id) as entry_count'),
-                DB::raw('SUM(entries.minutes) as total_minutes')
-            )
-            ->groupBy('users.id')
-            ->orderByDesc('total_minutes')
-            ->get();
-
-        // Daily breakdown for the week
-        $dailyActivityBreakdown = Entry::query()
-            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-            ->where('tasks.project_id', $project->id)
-            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
-            ->select(
-                DB::raw('DATE(entries.created_at) as date'),
-                DB::raw('COUNT(entries.id) as entry_count'),
-                DB::raw('SUM(entries.minutes) as total_minutes')
-            )
-            ->groupBy(DB::raw('DATE(entries.created_at)'))
-            ->orderBy('date')
-            ->get();
-
-        // Task completions this week
-        $tasksCompletedThisWeek = Task::query()
-            ->where('project_id', $project->id)
-            ->where('status', 'completed')
-            ->whereBetween('updated_at', [$weekStart, $weekEnd])
-            ->count();
-
-        // Overall weekly stats
-        $weeklyStats = [
-            'total_entries' => Entry::query()
-                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-                ->where('tasks.project_id', $project->id)
-                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
-                ->count(),
-            'total_minutes' => Entry::query()
-                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-                ->where('tasks.project_id', $project->id)
-                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
-                ->sum('entries.minutes') ?? 0,
-            'total_users' => Entry::query()
-                ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-                ->where('tasks.project_id', $project->id)
-                ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
-                ->distinct('entries.user_id')
-                ->count('entries.user_id'),
-            'tasks_completed' => $tasksCompletedThisWeek,
-        ];
+        // Get all statistics using helper methods
+        $taskStatusStats = $this->getTaskStatusStats($project);
+        $taskTimeStats = $this->getTaskTimeStats($project);
+        $weeklyUserActivity = $this->getWeeklyUserActivity($project, $weekStart, $weekEnd);
+        $dailyActivityBreakdown = $this->getDailyActivityBreakdown($project, $weekStart, $weekEnd);
+        $weeklyStats = $this->getWeeklyStats($project, $weekStart, $weekEnd);
 
         return response()->json([
             'taskStatusStats' => $taskStatusStats,
@@ -326,19 +182,7 @@ class ProjectController extends Controller
     public function edit(Project $project)
     {
         $this->authorize('viewUpdate', $project);
-        // Get user stats
-        $userStats = Entry::query()
-            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
-            ->where('tasks.project_id', $project->id)
-            ->select(
-                'entries.user_id',
-                DB::raw('COUNT(entries.id) as entry_count'),
-                DB::raw('SUM(entries.minutes) as total_minutes')
-            )
-            ->groupBy('entries.user_id')
-            ->get()
-            ->keyBy('user_id');
-
+        $userStats = $this->getUserStats($project);
         return view('projects.edit', compact('project', 'userStats'));
     }
 
@@ -387,23 +231,34 @@ class ProjectController extends Controller
     {
         $this->authorize('delete', $project);
         $project->delete();
-        return redirect()->route('projects.index')->with('success', 'Project succesfully deleted!');
+        return redirect()->route('projects.index')
+            ->with('success', 'Project successfully deleted!');
     }
+    /**
+     * Archive a project by changing its status
+     */
     public function archive(Project $project)
     {
         $this->authorize('softDelete', $project);
         $project->status = 'archived';
         $project->save();
-        return redirect()->back()->with('success', 'Project succesfully archived!');
+        return redirect()->back()
+            ->with('success', 'Project successfully archived!');
     }
+    /**
+     * Restore an archived project
+     */
     public function restore(Project $project)
     {
         $this->authorize('restore', $project);
         $project->status = 'active';
         $project->save();
-        return redirect()->back()->with('success', 'Project succesfully restored!');
+        return redirect()->back()
+            ->with('success', 'Project successfully restored!');
     }
-        /**     * Export the statistics for the specified week as CSV.     */
+    /**
+     * Export weekly statistics as CSV
+     */
     public function export(Request $request, Project $project)
     {
         $this->authorize('view', $project);
@@ -455,4 +310,164 @@ class ProjectController extends Controller
         }, "weekly_statistics_{$weekStart->format('Y_m_d')}.csv");
     }
 
+    /**
+     * Get user statistics for a project (entry count and total minutes per user).
+     */
+    private function getUserStats(Project $project)
+    {
+        return Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->where('tasks.project_id', $project->id)
+            ->select(
+                'entries.user_id',
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy('entries.user_id')
+            ->get()
+            ->keyBy('user_id');
     }
+
+    /**
+     * Get overall project statistics (task count, total minutes, entry count).
+     */
+    private function getProjectStats(Project $project)
+    {
+        return Project::query()
+            ->join('tasks', 'tasks.project_id', '=', 'projects.id')
+            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
+            ->where('projects.id', $project->id)
+            ->select(
+                'projects.id',
+                DB::raw('COUNT(DISTINCT tasks.id) as total_task_count'),
+                DB::raw('COALESCE(SUM(entries.minutes), 0) as total_minutes'),
+                DB::raw('COUNT(entries.id) as total_entry_count')
+            )
+            ->groupBy('projects.id')
+            ->get()
+            ->keyBy('id');
+    }
+
+    /**
+     * Get weekly user statistics including effort and entry counts.
+     */
+    private function getWeeklyUserStats(Project $project)
+    {
+        return Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->join('users', 'users.id', '=', 'entries.user_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [
+                now()->startOfWeek(),
+                now()->endOfWeek()
+            ])
+            ->select(
+                'entries.user_id',
+                DB::raw('SUM(entries.minutes) as total_minutes'),
+                DB::raw('COUNT(entries.id) as entry_count')
+            )
+            ->groupBy('entries.user_id')
+            ->get()
+            ->map(function ($stat) {
+                $stat->user = User::find($stat->user_id);
+                return $stat;
+            });
+    }
+
+    /**
+     * Get task status statistics (excluding archived tasks).
+     */
+    private function getTaskStatusStats(Project $project)
+    {
+        return Task::query()
+            ->where('project_id', $project->id)
+            ->where('status', '!=', 'archived')
+            ->select(
+                'status',
+                DB::raw('COUNT(*) as count')
+            )
+            ->groupBy('status')
+            ->get();
+    }
+
+    /**
+     * Get total time spent per task.
+     */
+    private function getTaskTimeStats(Project $project)
+    {
+        return Task::query()
+            ->leftJoin('entries', 'entries.task_id', '=', 'tasks.id')
+            ->where('tasks.project_id', $project->id)
+            ->select(
+                'tasks.title',
+                DB::raw('COALESCE(SUM(entries.minutes), 0) as minutes')
+            )
+            ->groupBy('tasks.id', 'tasks.title')
+            ->orderByDesc('minutes')
+            ->get();
+    }
+
+    /**
+     * Get weekly user activity summary for a specific week.
+     */
+    private function getWeeklyUserActivity(Project $project, $weekStart, $weekEnd)
+    {
+        return Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->join('users', 'users.id', '=', 'entries.user_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+            ->select(
+                'users.id',
+                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as name"),
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy('users.id')
+            ->orderByDesc('total_minutes')
+            ->get();
+    }
+
+    /**
+     * Get daily activity breakdown for a week.
+     */
+    private function getDailyActivityBreakdown(Project $project, $weekStart, $weekEnd)
+    {
+        return Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [$weekStart, $weekEnd])
+            ->select(
+                DB::raw('DATE(entries.created_at) as date'),
+                DB::raw('COUNT(entries.id) as entry_count'),
+                DB::raw('SUM(entries.minutes) as total_minutes')
+            )
+            ->groupBy(DB::raw('DATE(entries.created_at)'))
+            ->orderBy('date')
+            ->get();
+    }
+
+    /**
+     * Get weekly statistics summary (totals and counts).
+     */
+    private function getWeeklyStats(Project $project, $weekStart, $weekEnd)
+    {
+        $entryQuery = Entry::query()
+            ->join('tasks', 'tasks.id', '=', 'entries.task_id')
+            ->where('tasks.project_id', $project->id)
+            ->whereBetween('entries.created_at', [$weekStart, $weekEnd]);
+
+        $tasksCompletedThisWeek = Task::query()
+            ->where('project_id', $project->id)
+            ->where('status', 'completed')
+            ->whereBetween('updated_at', [$weekStart, $weekEnd])
+            ->count();
+
+        return [
+            'total_entries' => (clone $entryQuery)->count(),
+            'total_minutes' => (clone $entryQuery)->sum('entries.minutes') ?? 0,
+            'total_users' => (clone $entryQuery)->distinct('entries.user_id')->count('entries.user_id'),
+            'tasks_completed' => $tasksCompletedThisWeek,
+        ];
+    }
+}

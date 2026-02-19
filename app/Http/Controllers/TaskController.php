@@ -11,13 +11,6 @@ use Illuminate\Support\Facades\Validator;
 class TaskController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }         
-    /**
      * Show the form for creating a new resource.
      */
     public function create(Project $project)
@@ -32,7 +25,7 @@ class TaskController extends Controller
     public function store(Request $request, Project $project)
     {
         $this->authorize('create', $project);
-        // must authentificate user before allowing to create task | later
+
         $validator = Validator::make($request->all(), [
             'title' => ['required','string','max:100'],
             'description' => ['nullable','string','max:255'],
@@ -51,16 +44,8 @@ class TaskController extends Controller
         $task->project_id = $project->id;
         $task->save();
 
-        return redirect()->route('projects.show', $task->project)->with('success', 'Task succesfully created!');
-    }
-    public function archived(Project $project, Task $task)
-    {
-        // abort_unless($task->project_id === $project->id, 404);
-        $this->authorize('softDelete', $task);
-        $task->status = 'archived';
-        $task->save();
-
-        return redirect()->back()->with('success', 'Task succesfully archived!');
+        return redirect()->route('projects.show', $task->project)
+            ->with('success', 'Task successfully created!');
     }
 
     /**
@@ -69,45 +54,52 @@ class TaskController extends Controller
     public function show(Project $project, Task $task)
     {
         $this->authorize('view', $project);
-        // abort_unless($task->project_id === $project->id, 404);
-        // eager load project
         $task->load(['project']);
-        // get task stats
-        $taskStats = $task->entries()
-            ->selectRaw('COUNT(id) as total_entry_count, COALESCE(SUM(minutes), 0) as total_minutes')
-            ->first();
-        // get paginated entries
-        $entries = $task->entries()
-            ->latest()
-            ->paginate(10);
+
+        $taskStats = $this->getTaskStats($task);
 
         return view('tasks.show', compact(
             'task',
             'project',
-            'taskStats',
-            'entries'
+            'taskStats'
         ));
     }
 
+    /**
+     * Mark a task as complete
+     */
+    public function complete(Project $project, Task $task)
+    {
+        $this->authorize('update', $task);
+        $task->status = 'completed';
+        $task->save();
+
+        return redirect()->back()->with('success', 'Task successfully marked as complete!');
+    }
+
+    /**
+     * Mark a task as archived
+     */
+    public function archived(Project $project, Task $task)
+    {
+        $this->authorize('softDelete', $task);
+        $task->status = 'archived';
+        $task->save();
+
+        return redirect()->back()->with('success', 'Task successfully archived!');
+    }
 
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource
      */
     public function edit(Project $project, Task $task)
     {
         $this->authorize('update', $task);
-        // abort_unless($task->project_id === $project->id, 404);
-        // eager load project
         $task->load(['project']);
-        // get task stats
-        $taskStats = $task->entries()
-            ->selectRaw('COUNT(id) as total_entry_count, COALESCE(SUM(minutes), 0) as total_minutes')
-            ->first();
-        // get paginated entries
-        $entries = $task->entries()
-            ->latest()
-            ->paginate(10);
+
+        $taskStats = $this->getTaskStats($task);
+        $entries = $task->entries()->latest()->paginate(10);
 
         return view('tasks.edit', compact(
             'task',
@@ -118,7 +110,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage
      */
     public function update(Request $request, Project $project, Task $task)
     {
@@ -142,17 +134,26 @@ class TaskController extends Controller
 
         return redirect()
             ->route('projects.tasks.show', [$project, $task])
-            ->with('success', 'Task succesfully updated!');
+            ->with('success', 'Task successfully updated!');
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage
      */
     public function destroy(Project $project, Task $task)
     {
         $this->authorize('delete', $task);
         $task->delete();
-        return back()->with('success', 'Task succesfully deleted!');
+        return back()->with('success', 'Task successfully deleted!');
+    }
+
+    /**
+     * Get task statistics including entry count and total minutes worked
+     */
+    private function getTaskStats(Task $task)
+    {
+        return $task->entries()
+            ->selectRaw('COUNT(id) as total_entry_count, COALESCE(SUM(minutes), 0) as total_minutes')
+            ->first();
     }
 }

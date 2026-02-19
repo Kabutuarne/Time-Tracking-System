@@ -37,9 +37,13 @@
 
         @if($task->status === 'completed')
             @can('softDelete', $task)
-                            <x-forms.sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}">
-                Archive Task
-            </x-forms.sm-button>
+            <x-forms.danger-sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}"
+                :confirm="true"
+                confirmTitle="Attention!"
+                confirmMessage="This action will make this task invisible and inaccessible to all users, besides managers and the owner!"
+            >
+                    Archive Task
+            </x-forms.danger-sm-button>
             @endcan
         @elseif($task->status === 'in_progress')
             @can('createEntry', $task)
@@ -49,9 +53,13 @@
             @endcan
            
             @can('softDelete', $task)
-            <x-forms.sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}">
+            <x-forms.danger-sm-button href="{{ route('projects.tasks.archived', [$project, $task]) }}"
+                :confirm="true"
+                confirmTitle="Attention!"
+                confirmMessage="This action will make this task invisible and inaccessible to all users, besides managers and the owner!"
+            >
                 Archive Task
-            </x-forms.sm-button>       
+            </x-forms.danger-sm-button>       
             @endcan
       
         @elseif($task->status === 'archived')
@@ -62,9 +70,9 @@
                     @csrf
                     @method('DELETE')
                     <x-forms.trash-button
-                            confirm="true"
-                            confirm-title="Warning!"
-                            confirm-message="This action will remove the task forever, and all entries for it will be forgotten!"
+                            :confirm="true"
+                            confirmTitle="Warning!"
+                            confirmMessage="This action will remove the task forever, and all entries for it will be forgotten!"
                         />
                 </form>
             @endcan

@@ -24,9 +24,6 @@
                 <h4 class="text-sm font-semibold text-textcol">{{ $project->user->username }}</h4>
                 <p class="text-xs text-slate-400">{{ $project->user->first_name }} {{ $project->user->last_name }}</p>
             </div>
-            {{-- @auth will add later meybe
-            <x-projects.card-role :role="dd(Auth::user()->projects->find($project->id)?->pivot->role)" />
-            @endauth --}}
         </div>
 
         <div class="mt-6 grid grid-cols-3 gap-3">
