@@ -29,7 +29,8 @@
                     </div>
                 </div>
 
-                <div x-data="{ tab: 'info' }" class="p-10 space-y-8">
+                <div x-data="{ tab: new URLSearchParams(window.location.search).get('tab') || 'info' }"
+                    class="p-10 space-y-8">
 
                     {{-- Tab Buttons --}}
                     <div class="flex gap-3 border-b border-white/5 pb-4">
@@ -48,7 +49,7 @@
                         <button @click="tab = 'summary'"
                             :class="tab === 'summary' ? 'text-primary border-primary' : 'text-textcol2 border-transparent'"
                             class="border-b-2 pb-2 font-semibold transition">
-                            Statistics
+                            Work Distribution This Week
                         </button>
                     </div>
 
@@ -77,17 +78,15 @@
                                             <i class="fas fa-edit mr-2"></i> Edit Profile
                                         </x-forms.button>
 
-                                        <x-forms.button href="#">
-                                            <i class="fas fa-key mr-2"></i> Change Password
-                                        </x-forms.button>
-
                                         <form method="POST" action="{{ route('users.destroy', $user) }}">
                                             @csrf
                                             @method('DELETE')
-                                            <x-forms.button>
+                                            <x-forms.danger-button :confirm="true"
+                                                confirmTitle="This Action is Irrevirsable!"
+                                                confirmMessage="Are you sure you want to delete your account? This action cannot be undone, the projects and entries you have made will disappear forever!">
                                                 <i class="fa-solid fa-trash mr-2 text-red-300"></i>
                                                 <span class="text-red-300 font-bold">Delete Account</span>
-                                            </x-forms.button>
+                                            </x-forms.danger-button>
                                         </form>
 
                                     </div>

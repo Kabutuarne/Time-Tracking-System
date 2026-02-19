@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class ProjectController extends Controller
@@ -51,15 +52,25 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         // validate inputs
-        // $this->authorize('create');
+        $this->authorize('create', Project::class);
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required','string','max:100'],
             'description' => ['nullable','string','max:255'],
             'is_public' => ['required','boolean'],
             'users' => ['nullable','array'],
             'users.*' => ['exists:users,id'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Validation failed. Please check the form.');
+        }
+
+        $validated = $validator->validated();
 
         // create the project
         $project = Project::create([
@@ -339,12 +350,22 @@ class ProjectController extends Controller
     {
         $this->authorize('update', $project);
 
-        $data = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:255'],
             'is_public' => ['required', 'in:0,1'],
             'status' => ['required', Rule::in(['on-hold', 'finished', 'active'])]
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Data validation failed. Please check the form.');
+        }
+
+        $data = $validator->validated();
         $data['is_public'] = (int) $data['is_public'];
         // stores or updates users(members of the project)
         $selectedUsers = $request->input('users', []);

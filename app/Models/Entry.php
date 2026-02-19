@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Project;
-use App\Traits\HasProjectRoles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;

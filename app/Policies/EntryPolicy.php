@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\User;
 use App\Models\Entry;
 use App\Models\Project;
-use Illuminate\Auth\Access\Response;
 
 class EntryPolicy
 {

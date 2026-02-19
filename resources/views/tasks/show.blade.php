@@ -125,19 +125,7 @@
                     {{-- Task Entries --}}
                     <div class="space-y-4">
                         <h2 class="text-2xl font-bold text-textcol">Task Entries</h2>
-
-                        <div class="space-y-4">
-                            @forelse ($entries as $entry)
-                                <x-projects.entry-card :entry="$entry" :project="$task->project" />
-                            @empty
-                                <div class="rounded-xl bg-slate-950/40 p-8 text-center ring-1 ring-white/5">
-                                    <i class="fa-solid fa-inbox text-4xl text-slate-600 mb-3"></i>
-                                    <p class="text-slate-400">No entries for this task yet.</p>
-                                </div>
-                            @endforelse
-                        </div>
-
-                        {{ $entries->links() }}
+                        @livewire('project-entries', ['project' => $project])
                     </div>
 
                 </div>

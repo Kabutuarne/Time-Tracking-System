@@ -122,31 +122,7 @@
                 {{-- entries --}}
                 <div class="lg:col-span-2 space-y-4">
                     <h2 class="text-2xl font-bold text-textcol">Task Entries</h2>
-                    <div class="space-y-4">
-                        @forelse ($entries as $entry)
-                            <div class="relative">
-                                <x-projects.entry-card :entry="$entry" :project="$task->project" />
-
-                                <form method="POST"
-                                      action="{{ route('projects.tasks.entries.destroy', [$task->project, $task, $entry]) }}"
-                                      class="absolute bottom-1 right-0"
-                                >
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-forms.trash-button
-                                        confirm="true"
-                                        confirm-title="Warning!"
-                                        confirm-message="This action will delete the entry forever, and the time spent on it will be forgotten!"
-                                    />
-                                </form>
-                            </div>
-                        @empty
-                            <div class="rounded-xl bg-slate-950/40 p-8 text-center ring-1 ring-white/5">
-                                <p class="text-slate-400">No entries yet.</p>
-                            </div>
-                        @endforelse
-                    </div>
-                    {{ $entries->links() }}
+                    @livewire('project-entries', ['project' => $task->project])
                 </div>
             </div>
 

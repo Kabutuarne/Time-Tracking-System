@@ -6,6 +6,7 @@ use App\Models\Task;
 use App\Models\Entry;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class EntryController extends Controller
 {
@@ -35,13 +36,24 @@ class EntryController extends Controller
      */
     public function store(Project $project, Task $task, Request $request)
     {
-         $this->authorize('createEntry', $task);
-        $validated = $request->validate([
+        $this->authorize('createEntry', $task);
+        
+        $validator = Validator::make($request->all(), [
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'description' => ['required', 'string', 'max:255'],
             'mark_complete' => ['nullable', 'boolean'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Validation failed. Please check the form.');
+        }
+
+        $validated = $validator->validated();
 
         Entry::create([
             'task_id' => $task->id,
@@ -82,11 +94,22 @@ class EntryController extends Controller
     public function update(Request $request, Project $project, Task $task, Entry $entry)
     {
         $this->authorize('update', $entry);
-        $validated = $request->validate([
+        
+        $validator = Validator::make($request->all(), [
             'work_date' => ['required', 'date'],
             'minutes' => ['required', 'integer', 'min:1', 'max:1440'],
             'description' => ['required', 'string', 'max:255'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Data validation failed. Please check the form.');
+        }
+
+        $validated = $validator->validated();
         $entry->update($validated);
         return redirect()
             ->route('projects.show', $project)->with('success', 'Entry succesfully created!');

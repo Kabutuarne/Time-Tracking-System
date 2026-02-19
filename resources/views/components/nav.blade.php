@@ -9,7 +9,7 @@
             @auth
                 {{-- Navigation Links --}}
                 <div class="flex items-center gap-3">
-                    <x-forms.sm-button href="{{ route('projects.index') }}">
+                    <x-forms.sm-button href="{{ route('users.show', auth()->user()) . '?tab=projects' }}">
                         <i class="fa-solid fa-folder-open mr-1"></i>
                         Your Projects
                     </x-forms.sm-button>

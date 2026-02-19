@@ -1,4 +1,5 @@
 <x-layout>
+    <x-slot:title>Login to Your Account</x-slot:title>
     <div class="flex items-center justify-center min-h-[80vh]">
         <article class="w-full max-w-md group/card">
             <div class="relative rounded-xl bg-slate-950/40 p-8 shadow-xl transition-all duration-300">
@@ -32,12 +33,6 @@
                             <label for="remember_me"
                                 class="ms-2 text-sm text-textcol/80 cursor-pointer">{{ __('Remember me') }}</label>
                         </div>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}"
-                                class="text-sm text-primary hover:text-secondary transition-colors">
-                                Forgot password?
-                            </a>
-                        @endif
                     </div>
 
                     <!-- Buttons -->

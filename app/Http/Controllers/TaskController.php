@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Task;
-use App\Models\User;
 use App\Models\Project;
+use App\Models\Task;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 
 class TaskController extends Controller
@@ -34,13 +33,21 @@ class TaskController extends Controller
     {
         $this->authorize('create', $project);
         // must authentificate user before allowing to create task | later
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required','string','max:100'],
             'description' => ['nullable','string','max:255'],
-            'due_date' => ['nullable','after:datetime:now'],
+            'due_date' => ['nullable','after:now'],
         ]);
 
-        $task = new Task($validated);
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($validator)
+                ->with('error', 'Validation failed. Please check the form.');
+        }
+
+        $task = new Task($validator->validated());
         $task->project_id = $project->id;
         $task->save();
 
@@ -53,7 +60,7 @@ class TaskController extends Controller
         $task->status = 'archived';
         $task->save();
 
-        return redirect()->back()->with('success', 'Task succesfully archived!');;
+        return redirect()->back()->with('success', 'Task succesfully archived!');
     }
 
     /**
@@ -117,18 +124,25 @@ class TaskController extends Controller
     {
         $this->authorize('update', $task);
 
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'title' => ['required','string','max:100'],
             'description' => ['nullable','string','max:255'],
-            'due_date' => ['nullable','after:datetime:now'],
+            'due_date' => ['nullable','after:now'],
             'status' => ['required','in:in_progress,completed,archived'],
         ]);
 
-        $task->update($validated);
+        if ($validator->fails()) {
+            return redirect()
+                ->back()
+                ->withErrors($validator)
+                ->with('error', 'Data validation failed. Please check the form.');
+        }
+
+        $task->update($validator->validated());
 
         return redirect()
             ->route('projects.tasks.show', [$project, $task])
-            ->with('success', 'Task succesfully created!');
+            ->with('success', 'Task succesfully updated!');
     }
 
 
